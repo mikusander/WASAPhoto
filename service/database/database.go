@@ -54,17 +54,92 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
-	// Check if table exists. If not, the database is empty, and we need to create the structure
-	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	
+	_, err := db.Exec("PRAGMA foreign_key = ON")
+	if err != nil {
+		return nil, err
 	}
+	
+	// Check if table exists. If not, the database is empty, and we need to create the structure
+
+	sqlStmt := `CREATE TABLE IF NOT EXISTS User(
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+		username TEXT NOT NULL UNIQUE
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+	
+	sqlStmt = `CREATE TABLE IF NOT EXISTS photo(
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+		date TEXT NOT NULL, 
+		text TEXT NOT NULL, 
+		photo BLOB NOT NULL, 
+		user_id INTEGER NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES User(id)
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	sqlStmt = `CREATE TABLE IF NOT EXISTS comment(
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		text TEXT NOT NULL,
+		date TEXT NOT NULL,
+		user_id INTEGERE NOT NULL,
+		photo_id INTEGER NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES User(id),
+		FOREIGN KEY (photo_id) REFERENCES photo(id)
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	sqlStmt = `CREATE TABLE IF NOT EXISTS like(
+		user_id INTEGER NOT NULL,
+		photo_id INTEGER NON TULL,
+		PRIMARY KEY (user_id, photo_id),
+		FOREIGN KEY (user_id) REFERENCES User(id),
+		FOREIGN KEY (photo_id) REFERENCES photo(id)
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	sqlStmt = `CREATE TABLE IF NOT EXISTS follow(
+		personal_user_id  INTEGER NOT NULL,
+		follow_user_id INTEGER NOT NULL,
+		PRIMARY KEY(personal_user_id, follow_user_id),
+		FOREIGN KEY (personal_user_id) REFERENCES User(id),
+		FOREIGN KEY (follow_user_id) REFERENCES User(id)
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	sqlStmt = `CREATE TABLE IF NOT EXISTS ban(
+		personal_user_id INTEGER NOT NULL,
+		ban_user_id INTEGER NOT NULL,
+		PRIMARY KEY(personal_user_id, ban_user_id)
+		FOREIGN KEY(personal_user_id) REFERENCES User(id)
+		FOREIGN KEY(ban_user_id) REFERENCES User(id)
+	);`
+
+	_, err = db.Exec(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
 
 	return &appdbimpl{
 		c: db,

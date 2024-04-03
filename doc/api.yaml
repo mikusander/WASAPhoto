@@ -153,7 +153,7 @@ paths:
         - follow
       summary: Follow user
       description: |
-        this endpoint be able to follow another user.
+        this endpoint is used to follow another user.
       operationId: followUser
       responses:
         "200":
@@ -171,7 +171,7 @@ paths:
         - follow
       summary: unfollow user
       description: |
-        this endppoint be able to unfollow a user
+        this endppoint is used to unfollow a user
       operationId: unfollowUser
       responses:
         "204":
@@ -199,7 +199,7 @@ paths:
         - ban
       summary: Ban user
       description: |
-        This endpoint be able to ban a user.
+        This endpoint is used to ban a user.
       operationId: banUser
       responses:
         "200":
@@ -217,7 +217,7 @@ paths:
         - ban
       summary: Unban user
       description: |
-        This endpoint be able to unban a user.
+        This endpoint is used to unban a user.
       operationId: unbanUser
       responses:
         "204":
@@ -250,11 +250,11 @@ paths:
         - like
       summary: Like photo
       description: |
-        This endpoint be able to put like.
+        This endpoint is used to put like.
       operationId: likePhoto
       responses:
         "200":
-          description: Utente bannato con successo
+          description: like photo successful
           content:
             application/json:
               schema: { $ref: "#/components/schemas/like" }
@@ -268,7 +268,7 @@ paths:
         - like
       summary: Unlike photo
       description: |
-        This endpoint be able to unlike a photo
+        This endpoint is used to unlike a photo
       operationId: unlikePhoto
       responses:
         "204":
@@ -295,7 +295,7 @@ paths:
         - comment
       summary: comment photo
       description: |
-        This endpoint be able to put a comment
+        This endpoint is used to put a comment to a photo
       operationId: commentPhoto
       requestBody: 
         content:
@@ -304,7 +304,7 @@ paths:
               { $ref: "#/components/schemas/comment" }
       responses:
         "201":
-          description: Utente bannato con successo
+          description: photo comment successful
           content:
             application/json:
               schema: { $ref: "#/components/schemas/comment" }
@@ -336,11 +336,11 @@ paths:
         - comment
       summary: uncomment photo
       description: |
-        This endpoint be able to remove a comment.
+        This endpoint is used to remove a comment.
       operationId: uncommentPhoto
       responses:
         "204":
-          description: Utente bannato con successo
+          description: the comment is removed
         "400": { $ref: '#/components/responses/BadRequest' }
         "500": { $ref: "#/components/responses/InternalServerError" }
 
@@ -364,11 +364,11 @@ paths:
         - Photo
       summary: remove photo
       description: |
-        This endpoint be able to delete a photo.
+        This endpoint is used to delete a photo.
       operationId: deletePhoto
       responses:
         "204":
-          description: Utente bannato con successo
+          description: Photo removed
         "400": { $ref: '#/components/responses/BadRequest' }
         "500": { $ref: "#/components/responses/InternalServerError" }
 
@@ -415,7 +415,7 @@ paths:
       description: return the user profile. In the user profile there are a number of follow, numer of following, number of photo, and a list of user photo.
       responses:
         "200": 
-          description: User profile retrived.
+          description: Stream retrived.
           content:
             application/json:
               schema: 
@@ -498,6 +498,7 @@ components:
           pattern: '^.*?$'
           minLength: 3
           maxLength: 16
+          readOnly: true
           example: cj3kl
         text:
           description: text of the comment
@@ -631,6 +632,7 @@ components:
           pattern: '^.*?$'
           minLength: 3
           maxLength: 16
+          readOnly: true
           example: cj3kl
         date:
           description: date of the comment
@@ -647,6 +649,9 @@ components:
           description: number of photo comments
           type: integer
           example: 40
+        text:
+          description: description of the photo
+
         photo:
           description: photo post
           type: string
