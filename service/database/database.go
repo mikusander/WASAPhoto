@@ -62,7 +62,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 
-	sqlStmt := `CREATE TABLE IF NOT EXISTS User(
+	sqlStmt := `CREATE TABLE IF NOT EXISTS user(
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 		username TEXT NOT NULL UNIQUE
 	);`
@@ -76,7 +76,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 		date TEXT NOT NULL, 
 		text TEXT NOT NULL, 
-		photo BLOB NOT NULL, 
+		image BLOB NOT NULL, 
 		user_id INTEGER NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES User(id)
 	);`

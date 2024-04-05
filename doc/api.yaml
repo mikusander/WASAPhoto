@@ -650,8 +650,12 @@ components:
           type: integer
           example: 40
         text:
-          description: description of the photo
-
+          description: text of the post
+          type: string
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 16
+          example: cj3kl
         photo:
           description: photo post
           type: string
