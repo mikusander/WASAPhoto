@@ -41,6 +41,10 @@ type AppDatabase interface {
 	GetName() (string, error)
 	SetName(name string) error
 
+	//login
+	CheckUserExists(username string) (string, error)
+	CreateUser(username string) (string, error)
+
 	Ping() error
 }
 
@@ -62,9 +66,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 
-	sqlStmt := `CREATE TABLE IF NOT EXISTS user(
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
-		username TEXT NOT NULL UNIQUE
+	sqlStmt := `CREATE TABLE IF NOT EXISTS User(
+		Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+		Username TEXT NOT NULL UNIQUE
 	);`
 
 	_, err = db.Exec(sqlStmt)
@@ -72,11 +76,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 	
-	sqlStmt = `CREATE TABLE IF NOT EXISTS photo(
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
-		date TEXT NOT NULL, 
-		text TEXT NOT NULL, 
-		image BLOB NOT NULL, 
+	sqlStmt = `CREATE TABLE IF NOT EXISTS Photo(
+		Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
+		Date TEXT NOT NULL, 
+		Text TEXT NOT NULL, 
+		Image BLOB NOT NULL, 
 		user_id INTEGER NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES User(id)
 	);`
@@ -86,10 +90,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	sqlStmt = `CREATE TABLE IF NOT EXISTS comment(
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		text TEXT NOT NULL,
-		date TEXT NOT NULL,
+	sqlStmt = `CREATE TABLE IF NOT EXISTS Comment(
+		Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		Text TEXT NOT NULL,
+		Date TEXT NOT NULL,
 		user_id INTEGERE NOT NULL,
 		photo_id INTEGER NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES User(id),
@@ -101,7 +105,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	sqlStmt = `CREATE TABLE IF NOT EXISTS like(
+	sqlStmt = `CREATE TABLE IF NOT EXISTS Like(
 		user_id INTEGER NOT NULL,
 		photo_id INTEGER NON TULL,
 		PRIMARY KEY (user_id, photo_id),
@@ -114,7 +118,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	sqlStmt = `CREATE TABLE IF NOT EXISTS follow(
+	sqlStmt = `CREATE TABLE IF NOT EXISTS Follow(
 		personal_user_id  INTEGER NOT NULL,
 		follow_user_id INTEGER NOT NULL,
 		PRIMARY KEY(personal_user_id, follow_user_id),
@@ -127,7 +131,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	sqlStmt = `CREATE TABLE IF NOT EXISTS ban(
+	sqlStmt = `CREATE TABLE IF NOT EXISTS Ban(
 		personal_user_id INTEGER NOT NULL,
 		ban_user_id INTEGER NOT NULL,
 		PRIMARY KEY(personal_user_id, ban_user_id)
