@@ -10,6 +10,6 @@ import (
 )
 
 type User struct{
-	ID 			string `json:"ID"`
+	ID 			uint64 `json:"ID"`
 	Username	string `json:"username"`
 }

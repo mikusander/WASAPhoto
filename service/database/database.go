@@ -42,8 +42,11 @@ type AppDatabase interface {
 	SetName(name string) error
 
 	//login
-	CheckUserExists(username string) (string, error)
-	CreateUser(username string) (string, error)
+	CheckUserExists(username string) (uint64, error)
+	CreateUser(username string) (uint64, error)
+
+	//User
+	SetNewUsername(userID uint64, newUsername string) error
 
 	Ping() error
 }

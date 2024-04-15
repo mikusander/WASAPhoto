@@ -26,16 +26,20 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	id, error := rt.db.CheckUserExists(user.Username)
 	if(error != nil){
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		return
 	}
 
-	if (id == ""){
-		_, error = rt.db.CreateUser(user.Username)
+	if (id == 0){
+		id, error = rt.db.CreateUser(user.Username)
 		if(error != nil){
 			http.Error(w,  "Errore nella creazioone dell'utente", http.StatusBadRequest)
 		}
+		user.ID = id
+	} else{
+		user.ID = id
 	}
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(user.ID)
 }
