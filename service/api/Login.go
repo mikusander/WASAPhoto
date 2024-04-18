@@ -1,6 +1,6 @@
 package api
 
-import(
+import (
 	"encoding/json"
 	"net/http"
 
@@ -8,34 +8,34 @@ import(
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext){
-	
-	//creo l'oggetto user
+func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// creo l'oggetto user
 	var user User
 
-	//decodifico il body e metto i campi dentro user
+	// decodifico il body e metto i campi dentro user
 	err := json.NewDecoder(r.Body).Decode(&user)
-    if err != nil {
-        http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
-        return
-    }
+	if err != nil {
+		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
+		return
+	}
 
-    // Chiudere il corpo della richiesta dopo la lettura
-    defer r.Body.Close()
+	// Chiudere il corpo della richiesta dopo la lettura
+	defer r.Body.Close()
 
 	id, error := rt.db.CheckUserExists(user.Username)
-	if(error != nil){
+	if error != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
 
-	if (id == 0){
+	if id == 0 {
 		id, error = rt.db.CreateUser(user.Username)
-		if(error != nil){
-			http.Error(w,  "Errore nella creazioone dell'utente", http.StatusBadRequest)
+		if error != nil {
+			http.Error(w, "Errore nella creazioone dell'utente", http.StatusBadRequest)
 		}
 		user.ID = id
-	} else{
+	} else {
 		user.ID = id
 	}
 

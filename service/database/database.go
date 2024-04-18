@@ -41,11 +41,11 @@ type AppDatabase interface {
 	GetName() (string, error)
 	SetName(name string) error
 
-	//login
+	// login
 	CheckUserExists(username string) (uint64, error)
 	CreateUser(username string) (uint64, error)
 
-	//User
+	// User
 	SetNewUsername(userID uint64, newUsername string) error
 
 	Ping() error
@@ -61,12 +61,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-	
+
 	_, err := db.Exec("PRAGMA foreign_key = ON")
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 
 	sqlStmt := `CREATE TABLE IF NOT EXISTS User(
@@ -78,7 +78,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
-	
+
 	sqlStmt = `CREATE TABLE IF NOT EXISTS Photo(
 		Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 		Date TEXT NOT NULL, 
@@ -146,7 +146,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
-
 
 	return &appdbimpl{
 		c: db,

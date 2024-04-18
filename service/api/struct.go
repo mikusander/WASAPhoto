@@ -1,17 +1,17 @@
 package api
 
-import(
+import (
 	"image"
 )
 
-type User struct{
-	ID 			uint64 `json:"ID"`
-	Username	string `json:"username"`
+type User struct {
+	ID       uint64 `json:"ID"`
+	Username string `json:"username"`
 }
 
-type photo struct{
-	ID			string `json:"ID"`
-	Date 		string
-	Text 		string `json:"text"`
-	Image 		image.Image `json:"image"`
+type photo struct {
+	ID    string `json:"ID"`
+	Date  string
+	Text  string      `json:"text"`
+	Image image.Image `json:"image"`
 }

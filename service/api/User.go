@@ -1,7 +1,6 @@
 package api
 
-
-import(
+import (
 	"encoding/json"
 	"net/http"
 
@@ -9,30 +8,30 @@ import(
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext){
-	
-	//prendo il nuovo username
+func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// prendo il nuovo username
 	var user User
 
-	//decodifico il body e metto i campi dentro user
+	// decodifico il body e metto i campi dentro user
 	err := json.NewDecoder(r.Body).Decode(&user)
-    if err != nil {
-        http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
-        return
-    }
+	if err != nil {
+		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
+		return
+	}
 
-    // Chiudere il corpo della richiesta dopo la lettura
-    defer r.Body.Close()
+	// Chiudere il corpo della richiesta dopo la lettura
+	defer r.Body.Close()
 
-	//prendo il vecchio username
+	// prendo il vecchio username
 	oldUsername := ps.ByName("user_name")
-	
+
 	userID, err := rt.db.CheckUserExists(oldUsername)
-	if(err != nil){
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if(userID == 0){
+	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
@@ -40,20 +39,20 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	user.ID = userID
 
 	id, err := rt.db.CheckUserExists(user.Username)
-	if(err != nil){
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if(id != 0){
+	if id != 0 {
 		http.Error(w, "Username già in uso", http.StatusBadRequest)
 		return
 	}
 
-	//cambio dell'username
+	// cambio dell'username
 	err = rt.db.SetNewUsername(userID, user.Username)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "errore nel cambio della password", http.StatusBadRequest)
-		return 
+		return
 	}
 
 	w.Header().Set("content-type", "application/json")

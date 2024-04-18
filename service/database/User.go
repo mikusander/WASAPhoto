@@ -1,9 +1,8 @@
 package database
 
-import(
-)
+import ()
 
-func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error{
+func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
 	// Prepara la query di aggiornamento
 	query := "UPDATE User SET username = ? WHERE id = ?"
 
