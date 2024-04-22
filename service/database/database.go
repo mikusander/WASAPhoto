@@ -48,6 +48,19 @@ type AppDatabase interface {
 	// User
 	SetNewUsername(userID uint64, newUsername string) error
 
+	//Photo
+	AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error)
+
+	//follow
+	NewFollow(PersonaleUserId string, FollowUserId string) error
+	CheckFollow(PersonaleUserId string, FollowUserId string) (bool, error)
+	RemoveFollow(PersonalUserId string, FollowUserId string) error
+
+	//Ban
+	NewBan(PersonaleUserId string, BanUserId string) error
+	CheckBan(PersonaleUserId string, BanUserId string) (bool, error)
+	RemoveBan(PersonalUserId string, BanUserId string) error
+
 	Ping() error
 }
 

@@ -75,7 +75,7 @@ paths:
                     example: 1
 
 
-  /users/{user_name}/username:
+  /users/{username}/username:
     parameters:
       - name: user_name
         in: path

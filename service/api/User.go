@@ -24,7 +24,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	defer r.Body.Close()
 
 	// prendo il vecchio username
-	oldUsername := ps.ByName("user_name")
+	oldUsername := ps.ByName("username")
 
 	userID, err := rt.db.CheckUserExists(oldUsername)
 	if err != nil {
@@ -33,6 +33,11 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
+		return
+	}
+	err = autentification(r.Header.Get("Authorization"), userID)
+	if err != nil{
+		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
 

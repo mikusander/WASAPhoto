@@ -24,7 +24,7 @@ func (db *appdbimpl) CheckUserExists(username string) (uint64, error) {
 
 func (db *appdbimpl) CreateUser(username string) (uint64, error) {
 	// Esegui una query per inserire il nuovo utente nella tabella degli utenti
-	query := `INSERT INTO User (username) VALUES (?)`
+	query := `INSERT INTO User (Username) VALUES (?)`
 	result, err := db.c.Exec(query, username)
 	if err != nil {
 		// Si è verificato un errore durante l'inserimento dell'utente
