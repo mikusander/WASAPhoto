@@ -1,7 +1,6 @@
 package database
 
-import (
-)
+import ()
 
 func (db *appdbimpl) CheckFollow(PersonaleUserId string, FollowUserId string) (bool, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
@@ -12,7 +11,7 @@ func (db *appdbimpl) CheckFollow(PersonaleUserId string, FollowUserId string) (b
 		// Si è verificato un errore durante l'esecuzione della query
 		return false, err
 	}
-	if isFollow == 0{
+	if isFollow == 0 {
 		return false, nil
 	}
 
@@ -34,12 +33,12 @@ func (db *appdbimpl) NewFollow(PersonalUserId string, FollowUserId string) error
 
 func (db *appdbimpl) RemoveFollow(PersonalUserId string, FollowUserId string) error {
 	// Esegui la query DELETE per rimuovere l'utente
-    query := "DELETE FROM Follow WHERE personal_user_id = ? and follow_user_id = ?"
+	query := "DELETE FROM Follow WHERE personal_user_id = ? and follow_user_id = ?"
 
-    // Esegui la query
-    _, err := db.c.Exec(query, PersonalUserId, FollowUserId)
-    if err != nil {
-        return err
-    }
+	// Esegui la query
+	_, err := db.c.Exec(query, PersonalUserId, FollowUserId)
+	if err != nil {
+		return err
+	}
 	return nil
 }

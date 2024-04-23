@@ -1,7 +1,6 @@
 package database
 
-import (
-)
+import ()
 
 func (db *appdbimpl) CheckBan(PersonaleUserId string, BanUserId string) (bool, error) {
 	// Eseguire una query per verificare se l'username ha già bannato l'altro utente
@@ -12,7 +11,7 @@ func (db *appdbimpl) CheckBan(PersonaleUserId string, BanUserId string) (bool, e
 		// Si è verificato un errore durante l'esecuzione della query
 		return false, err
 	}
-	if isBan == 0{
+	if isBan == 0 {
 		// L'utente può essere bannato
 		return false, nil
 	}
@@ -35,12 +34,12 @@ func (db *appdbimpl) NewBan(PersonalUserId string, BanUserId string) error {
 
 func (db *appdbimpl) RemoveBan(PersonalUserId string, BanUserId string) error {
 	// Esegui la query DELETE per rimuovere l'utente
-    query := "DELETE FROM Ban WHERE personal_user_id = ? and ban_user_id = ?"
+	query := "DELETE FROM Ban WHERE personal_user_id = ? and ban_user_id = ?"
 
-    // Esegui la query
-    _, err := db.c.Exec(query, PersonalUserId, BanUserId)
-    if err != nil {
-        return err
-    }
+	// Esegui la query
+	_, err := db.c.Exec(query, PersonalUserId, BanUserId)
+	if err != nil {
+		return err
+	}
 	return nil
 }
