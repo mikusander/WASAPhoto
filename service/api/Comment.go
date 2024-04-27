@@ -10,14 +10,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// prendo il nuovo username
-	var user User
+func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// creo l'oggetto comment
+	var comment Comment
 
 	// prendo l'username dal path
-	user.Username = ps.ByName("username")
+	username := ps.ByName("username")
 
-	userID, err := rt.db.CheckUserExists(user.Username)
+	userID, err := rt.db.CheckUserExists(username)
 	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
@@ -32,15 +32,29 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	user.ID = userID
+	comment.user_id = userID
 
-	// creo l'oggetto Photo
-	var photo Photo
+	// prendo l'id della photo dal path
+	photoid, err := strconv.ParseUint(ps.ByName("photoid"), 10, 64)
+	if err != nil {
+		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		return
+	}
 
-	photo.userID = userID
+	id, err := rt.db.CheckPhotoExists(photoid)
+	if err != nil {
+		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		return
+	}
+	if id == false {
+		http.Error(w, "La photo non esiste", http.StatusBadRequest)
+		return
+	}
+
+	comment.photo_id = photoid
 
 	// decodifico il body e metto i campi dentro user
-	err = json.NewDecoder(r.Body).Decode(&photo)
+	err = json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
 		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
 		return
@@ -55,26 +69,23 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Converti la data in una stringa utilizzando un formato specifico
 	dateString := now.Format("2006-01-02") // Formato: "YYYY-MM-DD"
 
-	photo.Date = dateString
+	comment.Date = dateString
 
-	photo.ID, err = rt.db.AddPhoto(photo.Date, photo.Text, photo.URL, photo.userID)
+	comment.ID, err = rt.db.AddComment(comment.Date, comment.Text, comment.user_id, comment.photo_id)
 	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
 
-	photo.likeCounter = 0
-	photo.commentCounter = 0
-
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(photo)
+	_ = json.NewEncoder(w).Encode(comment)
 }
 
-func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// prendo il nuovo username
-	var photo Photo
+	var comment Comment
 
 	// prendo l'username personale
 	username := ps.ByName("username")
@@ -85,28 +96,28 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	photo.userID = userID
+	comment.user_id = userID
 	// verifico se l'utente esiste
-	if photo.userID == 0 {
+	if comment.user_id == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
 	// eseguo il controllo di sicurezza
-	err = autentification(r.Header.Get("Authorization"), photo.userID)
+	err = autentification(r.Header.Get("Authorization"), comment.user_id)
 	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
 
 	// aggiungo all'oggetto follow l'username personale dell'utente
-	photo.ID, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
+	comment.photo_id, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
 	if err != nil {
 		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
 		return
 	}
 
 	// verifico se la foto che vuole seguire esiste
-	exist, err := rt.db.CheckPhotoExists(photo.ID)
+	exist, err := rt.db.CheckPhotoExists(comment.photo_id)
 	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
@@ -114,12 +125,32 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// se non esiste la photo ritorno errore
 	if exist == false {
-		http.Error(w, "La photo che si vuole cancellare non esiste", http.StatusBadRequest)
+		http.Error(w, "La photo non esiste", http.StatusBadRequest)
+		return
+	}
+
+	// aggiungo all'oggetto follow l'username personale dell'utente
+	comment.ID, err = strconv.ParseUint(ps.ByName("commentid"), 10, 64)
+	if err != nil {
+		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		return
+	}
+
+	// verifico se la foto che vuole seguire esiste
+	exist, err = rt.db.CheckCommentExists(comment.ID)
+	if err != nil {
+		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		return
+	}
+
+	// se non esiste la photo ritorno errore
+	if exist == false {
+		http.Error(w, "Il commento non esiste non esiste", http.StatusBadRequest)
 		return
 	}
 
 	// cancello la photo
-	err = rt.db.DeletePhoto(photo.ID)
+	err = rt.db.DeleteComment(comment.ID)
 	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
@@ -127,5 +158,5 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode("Delete photo success")
+	_ = json.NewEncoder(w).Encode("Delete comment success")
 }

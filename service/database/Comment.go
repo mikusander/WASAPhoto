@@ -2,10 +2,10 @@ package database
 
 import ()
 
-func (db *appdbimpl) AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error) {
+func (db *appdbimpl) AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error) {
 	// Esegui una query per inserire la nuova photo nella tabella delle photo
-	query := `INSERT INTO Photo (Date, Text, image, user_id) VALUES (?, ?, ?, ?)`
-	result, err := db.c.Exec(query, Date, Text, URL, userID)
+	query := `INSERT INTO Comment (Date, Text, user_id, photo_id) VALUES (?, ?, ?, ?)`
+	result, err := db.c.Exec(query, Date, Text, userID, photoID)
 	if err != nil {
 		// Si è verificato un errore durante l'inserimento dell'utente
 		return 0, err
@@ -23,11 +23,11 @@ func (db *appdbimpl) AddPhoto(Date string, Text string, URL []byte, userID uint6
 	return id, nil
 }
 
-func (db *appdbimpl) CheckPhotoExists(photoid uint64) (bool, error) {
+func (db *appdbimpl) CheckCommentExists(commentid uint64) (bool, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
-	query := `SELECT COUNT(*) FROM Photo WHERE Id = ?`
+	query := `SELECT COUNT(*) FROM Comment WHERE Id = ?`
 	var exist int
-	err := db.c.QueryRow(query, photoid).Scan(&exist)
+	err := db.c.QueryRow(query, commentid).Scan(&exist)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query
 		return false, err
@@ -40,9 +40,9 @@ func (db *appdbimpl) CheckPhotoExists(photoid uint64) (bool, error) {
 	return true, nil
 }
 
-func (db *appdbimpl) DeletePhoto(id uint64) error {
+func (db *appdbimpl) DeleteComment(id uint64) error {
 	// Esegui la query DELETE per rimuovere l'utente
-	query := "DELETE FROM Photo WHERE Id = ?"
+	query := "DELETE FROM Comment WHERE Id = ?"
 
 	// Esegui la query
 	_, err := db.c.Exec(query, id)

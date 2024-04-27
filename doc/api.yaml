@@ -77,7 +77,7 @@ paths:
 
   /users/{username}/username:
     parameters:
-      - name: user_name
+      - name: username
         in: path
         required: true
         description: user username

@@ -26,3 +26,11 @@ type Ban struct {
 	PersonalUserId string `json:"PersonalUserId"`
 	BanUserId      string `json:"BanUserId"`
 }
+
+type Comment struct {
+	ID       uint64 `json:"ID"`
+	Date     string `json:"Date"`
+	Text     string `json:"Text"`
+	user_id  uint64 `json:"user_id"`
+	photo_id uint64 `json:"photo_id"`
+}

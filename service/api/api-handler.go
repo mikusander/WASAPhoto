@@ -15,6 +15,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// Photo
 	rt.router.POST("/users/:username/photo", rt.wrap(rt.uploadPhoto))
+	rt.router.DELETE("/users/:username/photo/:photoid", rt.wrap(rt.deletePhoto))
 
 	// follow
 	rt.router.PUT("/users/:username/follow/:followid", rt.wrap(rt.followUser))
@@ -23,6 +24,10 @@ func (rt *_router) Handler() http.Handler {
 	// ban
 	rt.router.PUT("/users/:username/ban/:banid", rt.wrap(rt.banUser))
 	rt.router.DELETE("/users/:username/ban/:banid", rt.wrap(rt.unbanUser))
+
+	// comment
+	rt.router.POST("/users/:username/photo/:photoid/comment", rt.wrap(rt.commentPhoto))
+	rt.router.DELETE("/users/:username/photo/:photoid/comment/:commentid", rt.wrap(rt.uncommentPhoto))
 
 	// Register routes
 	rt.router.GET("/", rt.getHelloWorld)

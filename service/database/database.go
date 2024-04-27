@@ -50,6 +50,8 @@ type AppDatabase interface {
 
 	// Photo
 	AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error)
+	CheckPhotoExists(photoid uint64) (bool, error)
+	DeletePhoto(id uint64) error
 
 	// follow
 	NewFollow(PersonaleUserId string, FollowUserId string) error
@@ -60,6 +62,11 @@ type AppDatabase interface {
 	NewBan(PersonaleUserId string, BanUserId string) error
 	CheckBan(PersonaleUserId string, BanUserId string) (bool, error)
 	RemoveBan(PersonalUserId string, BanUserId string) error
+
+	// Comment
+	AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error)
+	CheckCommentExists(commentid uint64) (bool, error)
+	DeleteComment(id uint64) error
 
 	Ping() error
 }
