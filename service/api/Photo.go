@@ -33,7 +33,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	user.ID = userID
 
-	//creo l'oggetto Photo
+	// creo l'oggetto Photo
 	var photo Photo
 
 	photo.userID = userID
