@@ -24,7 +24,6 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:username/ban/:banid", rt.wrap(rt.banUser))
 	rt.router.DELETE("/users/:username/ban/:banid", rt.wrap(rt.unbanUser))
 
-
 	// Register routes
 	rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))

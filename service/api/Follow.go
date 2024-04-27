@@ -23,13 +23,13 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	// verifico se l'utente esiste
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
 	// eseguo il controllo di sicurezza
 	err = autentification(r.Header.Get("Authorization"), userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
@@ -45,25 +45,25 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// se non esiste l'utente da seguire ritorno errore
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente che si vuole seguire non esiste", http.StatusBadRequest)
 		return
 	}
 
 	// verifico se segue già l'utente che vuole seguire
 	isFollow, err := rt.db.CheckFollow(follow.PersonalUserId, follow.FollowUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if isFollow == true{
+	if isFollow == true {
 		http.Error(w, "Utente già seguito", http.StatusBadRequest)
 		return
 	}
 
 	// aggiungo al database il nuovo follow
 	err = rt.db.NewFollow(follow.PersonalUserId, follow.FollowUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
@@ -88,13 +88,13 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 	// verifico se l'utente esiste
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
 	// eseguo il controllo di sicurezza
 	err = autentification(r.Header.Get("Authorization"), userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
@@ -110,25 +110,25 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// se non esiste l'utente da seguire ritorno errore
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente che si vuole seguire non esiste", http.StatusBadRequest)
 		return
 	}
 
 	// verifico se segue già l'utente che vuole non seguire più
 	isFollow, err := rt.db.CheckFollow(follow.PersonalUserId, follow.FollowUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if isFollow == false{
+	if isFollow == false {
 		http.Error(w, "Utente non seguito", http.StatusBadRequest)
 		return
 	}
 
 	// rimuovo dal database il follow
 	err = rt.db.RemoveFollow(follow.PersonalUserId, follow.FollowUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}

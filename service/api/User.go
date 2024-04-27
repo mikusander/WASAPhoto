@@ -36,7 +36,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 	err = autentification(r.Header.Get("Authorization"), userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}

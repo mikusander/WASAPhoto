@@ -21,12 +21,12 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
 	err = autentification(r.Header.Get("Authorization"), userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
@@ -38,37 +38,36 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente che si vuole seguire non esiste", http.StatusBadRequest)
 		return
 	}
 
 	isBan, err := rt.db.CheckBan(ban.PersonalUserId, ban.BanUserId)
-	if isBan == true{
+	if isBan == true {
 		http.Error(w, "Utente già bannato", http.StatusBadRequest)
 		return
 	}
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	
 
 	err = rt.db.NewBan(ban.PersonalUserId, ban.BanUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
 
 	// verifico se segue già l'utente che vuole non seguire più
 	isFollow, err := rt.db.CheckFollow(ban.PersonalUserId, ban.BanUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if isFollow == true{
+	if isFollow == true {
 		err = rt.db.RemoveFollow(ban.PersonalUserId, ban.BanUserId)
-		if err != nil{
+		if err != nil {
 			http.Error(w, "Errore nel db", http.StatusBadRequest)
 			return
 		}
@@ -94,13 +93,13 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 	// verifico se l'utente esiste
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
 		return
 	}
 	// eseguo il controllo di sicurezza
 	err = autentification(r.Header.Get("Authorization"), userID)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
 		return
 	}
@@ -116,25 +115,25 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// se non esiste l'utente da seguire ritorno errore
-	if userID == 0{
+	if userID == 0 {
 		http.Error(w, "L'utente che si vuole seguire non esiste", http.StatusBadRequest)
 		return
 	}
 
 	// verifico se segue già l'utente che vuole non seguire più
 	isBan, err := rt.db.CheckBan(ban.PersonalUserId, ban.BanUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
-	if isBan == false{
+	if isBan == false {
 		http.Error(w, "L'utente non era bannato", http.StatusBadRequest)
 		return
 	}
 
 	// rimuovo dal database il ban
 	err = rt.db.RemoveBan(ban.PersonalUserId, ban.BanUserId)
-	if err != nil{
+	if err != nil {
 		http.Error(w, "Errore nel db", http.StatusBadRequest)
 		return
 	}
