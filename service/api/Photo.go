@@ -11,38 +11,43 @@ import (
 )
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// prendo il nuovo username
+
+	// creo l'oggetto user
 	var user User
 
 	// prendo l'username dal path
 	user.Username = ps.ByName("username")
 
+	// verifico se l'uuser esiste
 	userID, err := rt.db.CheckUserExists(user.Username)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// se non esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	// controllo se l'utente ha i permessi
 	err = autentification(r.Header.Get("Authorization"), userID)
 	if err != nil {
-		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
+	// assegno all'oggetto user il suo id
 	user.ID = userID
 
 	// creo l'oggetto Photo
 	var photo Photo
 
-	photo.userID = userID
+	photo.UserID = userID
 
-	// decodifico il body e metto i campi dentro user
+	// decodifico il body e metto i campi dentro photo
 	err = json.NewDecoder(r.Body).Decode(&photo)
 	if err != nil {
-		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -57,14 +62,14 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	photo.Date = dateString
 
-	photo.ID, err = rt.db.AddPhoto(photo.Date, photo.Text, photo.URL, photo.userID)
+	photo.ID, err = rt.db.AddPhoto(photo.Date, photo.Text, photo.URL, photo.UserID)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	photo.likeCounter = 0
-	photo.commentCounter = 0
+	photo.LikeCounter = 0
+	photo.CommentCounter = 0
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -73,7 +78,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// prendo il nuovo username
+	// creo l'oggetto photo
 	var photo Photo
 
 	// prendo l'username personale
@@ -82,50 +87,48 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// estraggo l'id dal database
 	userID, err := rt.db.CheckUserExists(username)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	photo.userID = userID
+	photo.UserID = userID
 	// verifico se l'utente esiste
-	if photo.userID == 0 {
-		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
+	if photo.UserID == 0 {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	// eseguo il controllo di sicurezza
-	err = autentification(r.Header.Get("Authorization"), photo.userID)
+	err = autentification(r.Header.Get("Authorization"), photo.UserID)
 	if err != nil {
-		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	// aggiungo all'oggetto follow l'username personale dell'utente
+	// estraggo dal path l'id della photo
 	photo.ID, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
 	if err != nil {
-		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// verifico se la foto che vuole seguire esiste
+	// verifico se la photo esiste
 	exist, err := rt.db.CheckPhotoExists(photo.ID)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// se non esiste la photo ritorno errore
 	if exist == false {
-		http.Error(w, "La photo che si vuole cancellare non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	// cancello la photo
 	err = rt.db.DeletePhoto(photo.ID)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode("Delete photo success")
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -47,11 +47,15 @@ type AppDatabase interface {
 
 	// User
 	SetNewUsername(userID uint64, newUsername string) error
+	GetListPhoto(userID uint64) ([]Photo, error)
+	GetFollowPerson(userID string) ([]uint64, error)
 
 	// Photo
 	AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error)
 	CheckPhotoExists(photoid uint64) (bool, error)
 	DeletePhoto(id uint64) error
+	CountPhoto(userUD uint64) (uint64, error)
+	GetAllPhoto(listFollow []uint64) ([]Photo, error)
 
 	// follow
 	NewFollow(PersonaleUserId string, FollowUserId string) error
@@ -63,10 +67,21 @@ type AppDatabase interface {
 	CheckBan(PersonaleUserId string, BanUserId string) (bool, error)
 	RemoveBan(PersonalUserId string, BanUserId string) error
 
+	// like
+	AddLike(user_id uint64, photo_id uint64) error
+	CheckLikeExists(user_id uint64, photo_id uint64) (bool, error)
+	DeleteLike(user_id uint64, photo_id uint64) error
+	LikeCounterPhoto(photo_id uint64) (uint64, error)
+
 	// Comment
 	AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error)
 	CheckCommentExists(commentid uint64) (bool, error)
 	DeleteComment(id uint64) error
+	CommentCounterPhoto(photo_id uint64) (uint64, error)
+
+	// My Profile
+	CountFollow(userID uint64) (uint64, error)
+	CountFollowing(userID uint64) (uint64, error)
 
 	Ping() error
 }

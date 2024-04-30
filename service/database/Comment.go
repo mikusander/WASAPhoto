@@ -3,15 +3,15 @@ package database
 import ()
 
 func (db *appdbimpl) AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error) {
-	// Esegui una query per inserire la nuova photo nella tabella delle photo
+	// Esegui una query per inserire il nuovo commento nella tabella dei commenti
 	query := `INSERT INTO Comment (Date, Text, user_id, photo_id) VALUES (?, ?, ?, ?)`
 	result, err := db.c.Exec(query, Date, Text, userID, photoID)
 	if err != nil {
-		// Si è verificato un errore durante l'inserimento dell'utente
+		// Si è verificato un errore durante l'inserimento della photo
 		return 0, err
 	}
 
-	// Ottieni l'ID generato per l'utente appena inserito
+	// Ottieni l'ID generato per la photo appena inserito
 	idInt, err := result.LastInsertId()
 	if err != nil {
 		// Si è verificato un errore durante il recupero dell'ID generato
@@ -24,7 +24,7 @@ func (db *appdbimpl) AddComment(Date string, Text string, userID uint64, photoID
 }
 
 func (db *appdbimpl) CheckCommentExists(commentid uint64) (bool, error) {
-	// Eseguire una query per verificare se l'username segue già quell'utente
+	// Eseguire una query per verificare se il commento esiste
 	query := `SELECT COUNT(*) FROM Comment WHERE Id = ?`
 	var exist int
 	err := db.c.QueryRow(query, commentid).Scan(&exist)
@@ -41,7 +41,7 @@ func (db *appdbimpl) CheckCommentExists(commentid uint64) (bool, error) {
 }
 
 func (db *appdbimpl) DeleteComment(id uint64) error {
-	// Esegui la query DELETE per rimuovere l'utente
+	// Esegui la query DELETE per rimuovere il commento
 	query := "DELETE FROM Comment WHERE Id = ?"
 
 	// Esegui la query
@@ -50,4 +50,21 @@ func (db *appdbimpl) DeleteComment(id uint64) error {
 		return err
 	}
 	return nil
+}
+
+func (db *appdbimpl) CommentCounterPhoto(photo_id uint64) (uint64, error) {
+	// Eseguire una query per contare il numero di commenti ha una photo
+	query := `SELECT COUNT(*) FROM Comment WHERE photo_id = ?`
+	var exist int
+	err := db.c.QueryRow(query, photo_id).Scan(&exist)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return 0, err
+	}
+	if exist == 0 {
+		return 0, nil
+	}
+
+	// La photo esiste
+	return uint64(exist), nil
 }

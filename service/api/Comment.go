@@ -17,46 +17,53 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// prendo l'username dal path
 	username := ps.ByName("username")
 
+	// verifico se l'utente esiste
 	userID, err := rt.db.CheckUserExists(username)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// se l'utente non esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	// effettuo il controllo sull'autentificazione
 	err = autentification(r.Header.Get("Authorization"), userID)
 	if err != nil {
-		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	comment.user_id = userID
+	// assegno l'user id all'oggetto comment
+	comment.User_id = userID
 
 	// prendo l'id della photo dal path
 	photoid, err := strconv.ParseUint(ps.ByName("photoid"), 10, 64)
 	if err != nil {
-		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// verifico se la photo esiste
 	id, err := rt.db.CheckPhotoExists(photoid)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// se non esiste ritorno errore
 	if id == false {
-		http.Error(w, "La photo non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	comment.photo_id = photoid
+	// assegno l'id della photo all'oggetto comment
+	comment.Photo_id = photoid
 
-	// decodifico il body e metto i campi dentro user
+	// decodifico il body e metto i campi dentro comment
 	err = json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
-		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -69,11 +76,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// Converti la data in una stringa utilizzando un formato specifico
 	dateString := now.Format("2006-01-02") // Formato: "YYYY-MM-DD"
 
+	// assegno la data all'oggetto comment
 	comment.Date = dateString
 
-	comment.ID, err = rt.db.AddComment(comment.Date, comment.Text, comment.user_id, comment.photo_id)
+	// aggiungo al database il nuovo commento
+	comment.ID, err = rt.db.AddComment(comment.Date, comment.Text, comment.User_id, comment.Photo_id)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -84,7 +93,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// prendo il nuovo username
+	// creo l'oggetto comment
 	var comment Comment
 
 	// prendo l'username personale
@@ -93,70 +102,71 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// estraggo l'id dal database
 	userID, err := rt.db.CheckUserExists(username)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	comment.user_id = userID
+
+	// assegno l'id dell'utebte all'oggetto comment
+	comment.User_id = userID
+
 	// verifico se l'utente esiste
-	if comment.user_id == 0 {
-		http.Error(w, "L'utente non esiste", http.StatusBadRequest)
+	if comment.User_id == 0 {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+
 	// eseguo il controllo di sicurezza
-	err = autentification(r.Header.Get("Authorization"), comment.user_id)
+	err = autentification(r.Header.Get("Authorization"), comment.User_id)
 	if err != nil {
-		http.Error(w, "Errore di autentificazione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	// aggiungo all'oggetto follow l'username personale dell'utente
-	comment.photo_id, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
+	// prendo dal path l'id della photo
+	comment.Photo_id, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
 	if err != nil {
-		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// verifico se la foto che vuole seguire esiste
-	exist, err := rt.db.CheckPhotoExists(comment.photo_id)
+	// verifico se la photo che vuole commentare esiste
+	exist, err := rt.db.CheckPhotoExists(comment.Photo_id)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// se non esiste la photo ritorno errore
 	if exist == false {
-		http.Error(w, "La photo non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	// aggiungo all'oggetto follow l'username personale dell'utente
+	// prendo l'id del commento
 	comment.ID, err = strconv.ParseUint(ps.ByName("commentid"), 10, 64)
 	if err != nil {
-		http.Error(w, "Errore nella conversione", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// verifico se la foto che vuole seguire esiste
+	// verifico se il commento esiste
 	exist, err = rt.db.CheckCommentExists(comment.ID)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// se non esiste la photo ritorno errore
+	// se non esiste ritorno errore
 	if exist == false {
-		http.Error(w, "Il commento non esiste non esiste", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	// cancello la photo
+	// cancello il commento
 	err = rt.db.DeleteComment(comment.ID)
 	if err != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode("Delete comment success")
+	w.WriteHeader(http.StatusNoContent)
 }

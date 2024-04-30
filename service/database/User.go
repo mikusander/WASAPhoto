@@ -13,3 +13,100 @@ func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
 	}
 	return nil
 }
+
+func (db *appdbimpl) CountFollow(userID uint64) (uint64, error) {
+	// Eseguire una query per verificare se l'username segue già quell'utente
+	query := `SELECT COUNT(*) FROM Follow WHERE personal_user_id = ?`
+	var numFollow uint64
+	err := db.c.QueryRow(query, userID).Scan(&numFollow)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return 0, err
+	}
+	return numFollow, err
+}
+
+func (db *appdbimpl) CountFollowing(userID uint64) (uint64, error) {
+	// Eseguire una query per verificare se l'username segue già quell'utente
+	query := `SELECT COUNT(*) FROM Follow WHERE follow_user_id = ?`
+	var numFollowing uint64
+	err := db.c.QueryRow(query, userID).Scan(&numFollowing)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return 0, err
+	}
+	return numFollowing, err
+}
+
+func (db *appdbimpl) GetFollowPerson(userID string) ([]uint64, error) {
+	// Eseguire una query per verificare se l'username segue già quell'utente
+	query := `SELECT follow_user_id FROM Follow WHERE personal_user_id = ?`
+	var follow []uint64
+	rows, err := db.c.Query(query, userID)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return nil, err
+	}
+	for rows.Next() {
+		var x string
+		err := rows.Scan(&x)
+		if err != nil {
+			return nil, err
+		}
+
+		var i uint64
+		i, err = db.CheckUserExists(x)
+		if err != nil {
+			return nil, err
+		}
+
+		follow = append(follow, i)
+	}
+
+	// Controlla se ci sono errori dopo l'iterazione dei risultati
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return follow, nil
+}
+
+func (db *appdbimpl) GetListPhoto(userID uint64) ([]Photo, error) {
+	// Eseguire una query per verificare se l'username segue già quell'utente
+	query := `SELECT * FROM Photo WHERE user_id = ?`
+	rows, err := db.c.Query(query, userID)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var listPhoto []Photo
+	for rows.Next() {
+		var photo Photo
+		err := rows.Scan(&photo.ID, &photo.Date, &photo.Text, &photo.URL, &photo.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		photo.LikeCounter, err = db.LikeCounterPhoto(photo.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		photo.CommentCounter, err = db.CommentCounterPhoto(photo.ID)
+		if err != nil {
+			return nil, err
+		}
+		listPhoto = append(listPhoto, photo)
+	}
+
+	// Controlla se ci sono errori dopo l'iterazione dei risultati
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return listPhoto, nil
+
+}

@@ -21,7 +21,7 @@ func (db *appdbimpl) CheckBan(PersonaleUserId string, BanUserId string) (bool, e
 }
 
 func (db *appdbimpl) NewBan(PersonalUserId string, BanUserId string) error {
-	// Esegui una query per inserire il nuovo utente nella tabella degli utenti
+	// Esegui una query per inserire il nuovo ban nella tabella dei ban
 	query := `INSERT INTO Ban (personal_user_id, ban_user_id) VALUES (?, ?)`
 	_, err := db.c.Exec(query, PersonalUserId, BanUserId)
 	if err != nil {
@@ -33,7 +33,7 @@ func (db *appdbimpl) NewBan(PersonalUserId string, BanUserId string) error {
 }
 
 func (db *appdbimpl) RemoveBan(PersonalUserId string, BanUserId string) error {
-	// Esegui la query DELETE per rimuovere l'utente
+	// Esegui la query DELETE per rimuovere il ban
 	query := "DELETE FROM Ban WHERE personal_user_id = ? and ban_user_id = ?"
 
 	// Esegui la query

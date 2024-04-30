@@ -16,7 +16,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	// decodifico il body e metto i campi dentro user
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		http.Error(w, "Impossibile leggere il corpo della richiesta", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -25,14 +25,16 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	id, error := rt.db.CheckUserExists(user.Username)
 	if error != nil {
-		http.Error(w, "Errore nel db", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// se l'utente non esiste lo creo
 	if id == 0 {
 		id, error = rt.db.CreateUser(user.Username)
 		if error != nil {
-			http.Error(w, "Errore nella creazioone dell'utente", http.StatusBadRequest)
+			http.Error(w, error.Error(), http.StatusInternalServerError)
+			return
 		}
 		user.ID = id
 	} else {
