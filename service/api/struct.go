@@ -35,17 +35,17 @@ type Ban struct {
 
 // Comment rappresenta un commento del sistema
 type Comment struct {
-	ID       uint64 `json:"ID"`
-	Date     string `json:"Date"`
-	Text     string `json:"Text"`
-	UserID uint64 `json:"User_id"`
+	ID      uint64 `json:"ID"`
+	Date    string `json:"Date"`
+	Text    string `json:"Text"`
+	UserID  uint64 `json:"User_id"`
 	PhotoID uint64 `json:"Photo_id"`
 }
 
 // Like rappresenta un like del sistema
 type Like struct {
-	UserID       uint64 `json:"User_id"`
-	Username       string `json:"Username"`
+	UserID        uint64 `json:"User_id"`
+	Username      string `json:"Username"`
 	PhotoID       uint64 `json:"Photo_id"`
 	Ownerphoto    uint64 `json:"Owner_photo"`
 	Usernameowner string `json:"Username_owner"`

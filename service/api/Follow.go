@@ -50,6 +50,12 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
+	// verifico se l'utente che segue e che vuole seguire non sia lo stesso
+	if follow.PersonalUserID == follow.FollowUserID {
+		http.Error(w, "Utente già seguito", http.StatusBadRequest)
+		return
+	}
+
 	// verifico se segue già l'utente che vuole seguire
 	isFollow, err := rt.db.CheckFollow(follow.PersonalUserID, follow.FollowUserID)
 	if err != nil {

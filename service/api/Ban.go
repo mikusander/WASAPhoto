@@ -49,15 +49,21 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// verifico se l'utente sia già bannato
-	isBan, err := rt.db.CheckBan(ban.PersonalUserID, ban.BanUserID)
-	// se è già bannato ritorno errore
-	if isBan == true {
+	// verifico se l'utente sta cercando di bannare se stesso e ritorno errore in caso sia vero
+	if ban.PersonalUserID == ban.BanUserID {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// verifico se l'utente sia già bannato
+	isBan, err := rt.db.CheckBan(ban.PersonalUserID, ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// se è già bannato ritorno errore
+	if isBan == true {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -137,7 +143,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 	// se non è bannato ritorno l'errore
-	if isBan == false{
+	if isBan == false {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
