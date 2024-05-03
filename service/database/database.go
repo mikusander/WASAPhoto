@@ -58,26 +58,26 @@ type AppDatabase interface {
 	GetAllPhoto(listFollow []uint64) ([]Photo, error)
 
 	// follow
-	NewFollow(PersonaleUserId string, FollowUserId string) error
-	CheckFollow(PersonaleUserId string, FollowUserId string) (bool, error)
-	RemoveFollow(PersonalUserId string, FollowUserId string) error
+	NewFollow(PersonaleUserID string, FollowUserID string) error
+	CheckFollow(PersonaleUserID string, FollowUserID string) (bool, error)
+	RemoveFollow(PersonalUserID string, FollowUserID string) error
 
 	// Ban
-	NewBan(PersonaleUserId string, BanUserId string) error
-	CheckBan(PersonaleUserId string, BanUserId string) (bool, error)
-	RemoveBan(PersonalUserId string, BanUserId string) error
+	NewBan(PersonaleUserID string, BanUserID string) error
+	CheckBan(PersonaleUserID string, BanUserID string) (bool, error)
+	RemoveBan(PersonalUserID string, BanUserID string) error
 
 	// like
-	AddLike(user_id uint64, photo_id uint64) error
-	CheckLikeExists(user_id uint64, photo_id uint64) (bool, error)
-	DeleteLike(user_id uint64, photo_id uint64) error
-	LikeCounterPhoto(photo_id uint64) (uint64, error)
+	AddLike(userid uint64, photoid uint64) error
+	CheckLikeExists(userid uint64, photoid uint64) (bool, error)
+	DeleteLike(userid uint64, photoid uint64) error
+	LikeCounterPhoto(photoid uint64) (uint64, error)
 
 	// Comment
 	AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error)
 	CheckCommentExists(commentid uint64) (bool, error)
 	DeleteComment(id uint64) error
-	CommentCounterPhoto(photo_id uint64) (uint64, error)
+	CommentCounterPhoto(photoid uint64) (uint64, error)
 
 	// My Profile
 	CountFollow(userID uint64) (uint64, error)

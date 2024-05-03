@@ -14,10 +14,10 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	var ban Ban
 
 	// prendo l'username personale
-	ban.PersonalUserId = ps.ByName("username")
+	ban.PersonalUserID = ps.ByName("username")
 
 	// verifico se l'username esiste
-	userID, err := rt.db.CheckUserExists(ban.PersonalUserId)
+	userID, err := rt.db.CheckUserExists(ban.PersonalUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -35,10 +35,10 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// prendo l'username dell'utente da bannare
-	ban.BanUserId = ps.ByName("banid")
+	ban.BanUserID = ps.ByName("banid")
 
 	// verifico se l'utente esiste
-	userID, err = rt.db.CheckUserExists(ban.BanUserId)
+	userID, err = rt.db.CheckUserExists(ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -50,7 +50,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// verifico se l'utente sia già bannato
-	isBan, err := rt.db.CheckBan(ban.PersonalUserId, ban.BanUserId)
+	isBan, err := rt.db.CheckBan(ban.PersonalUserID, ban.BanUserID)
 	// se è già bannato ritorno errore
 	if isBan == true {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -62,21 +62,21 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// aggiungo il ban al database
-	err = rt.db.NewBan(ban.PersonalUserId, ban.BanUserId)
+	err = rt.db.NewBan(ban.PersonalUserID, ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// verifico l'utente che si è bannato era seguito
-	isFollow, err := rt.db.CheckFollow(ban.PersonalUserId, ban.BanUserId)
+	isFollow, err := rt.db.CheckFollow(ban.PersonalUserID, ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// se era seguito rimuovo il follow
 	if isFollow == true {
-		err = rt.db.RemoveFollow(ban.PersonalUserId, ban.BanUserId)
+		err = rt.db.RemoveFollow(ban.PersonalUserID, ban.BanUserID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -94,10 +94,10 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	var ban Ban
 
 	// prendo l'username personale
-	ban.PersonalUserId = ps.ByName("username")
+	ban.PersonalUserID = ps.ByName("username")
 
 	// estraggo l'id dal database
-	userID, err := rt.db.CheckUserExists(ban.PersonalUserId)
+	userID, err := rt.db.CheckUserExists(ban.PersonalUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -115,10 +115,10 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// aggiungo all'oggetto ban l'username personale dell'utente
-	ban.BanUserId = ps.ByName("banid")
+	ban.BanUserID = ps.ByName("banid")
 
 	// verifico se l'utente al quale si vuole levare il ban esista
-	userID, err = rt.db.CheckUserExists(ban.BanUserId)
+	userID, err = rt.db.CheckUserExists(ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -131,19 +131,19 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// verifico se l'utente che si vuole sbannare si bannato
-	isBan, err := rt.db.CheckBan(ban.PersonalUserId, ban.BanUserId)
+	isBan, err := rt.db.CheckBan(ban.PersonalUserID, ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// se non è bannato ritorno l'errore
-	if isBan == false {
+	if isBan == false{
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	// rimuovo dal database il ban
-	err = rt.db.RemoveBan(ban.PersonalUserId, ban.BanUserId)
+	err = rt.db.RemoveBan(ban.PersonalUserID, ban.BanUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

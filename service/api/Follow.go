@@ -14,10 +14,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	var follow Follow
 
 	// prendo l'username personale
-	follow.PersonalUserId = ps.ByName("username")
+	follow.PersonalUserID = ps.ByName("username")
 
 	// estraggo l'id dal database
-	userID, err := rt.db.CheckUserExists(follow.PersonalUserId)
+	userID, err := rt.db.CheckUserExists(follow.PersonalUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -35,10 +35,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// aggiungo all'oggetto follow l'username personale dell'utente
-	follow.FollowUserId = ps.ByName("followid")
+	follow.FollowUserID = ps.ByName("followid")
 
 	// verifico se l'utente che vuole seguire esiste ed estraggo l'utente
-	userID, err = rt.db.CheckUserExists(follow.FollowUserId)
+	userID, err = rt.db.CheckUserExists(follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -51,7 +51,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// verifico se segue già l'utente che vuole seguire
-	isFollow, err := rt.db.CheckFollow(follow.PersonalUserId, follow.FollowUserId)
+	isFollow, err := rt.db.CheckFollow(follow.PersonalUserID, follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,7 +62,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// aggiungo al database il nuovo follow
-	err = rt.db.NewFollow(follow.PersonalUserId, follow.FollowUserId)
+	err = rt.db.NewFollow(follow.PersonalUserID, follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -79,10 +79,10 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	var follow Follow
 
 	// prendo l'username personale
-	follow.PersonalUserId = ps.ByName("username")
+	follow.PersonalUserID = ps.ByName("username")
 
 	// estraggo l'id dal database
-	userID, err := rt.db.CheckUserExists(follow.PersonalUserId)
+	userID, err := rt.db.CheckUserExists(follow.PersonalUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -100,10 +100,10 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// aggiungo all'oggetto follow l'username personale dell'utente
-	follow.FollowUserId = ps.ByName("followid")
+	follow.FollowUserID = ps.ByName("followid")
 
 	// verifico se l'utente che vuole seguire esiste ed estraggo l'utente
-	userID, err = rt.db.CheckUserExists(follow.FollowUserId)
+	userID, err = rt.db.CheckUserExists(follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -116,7 +116,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// verifico se segue già l'utente che vuole non seguire più
-	isFollow, err := rt.db.CheckFollow(follow.PersonalUserId, follow.FollowUserId)
+	isFollow, err := rt.db.CheckFollow(follow.PersonalUserID, follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -127,7 +127,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// rimuovo dal database il follow
-	err = rt.db.RemoveFollow(follow.PersonalUserId, follow.FollowUserId)
+	err = rt.db.RemoveFollow(follow.PersonalUserID, follow.FollowUserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

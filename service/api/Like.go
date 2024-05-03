@@ -36,7 +36,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// assegno id e username all'oggetto like
-	like.User_id = userID
+	like.UserID = userID
 	like.Username = username
 
 	// prendo l'id della photo dal path
@@ -59,7 +59,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// assegno l'id della photo all'oggetto like
-	like.Photo_id = photoid
+	like.PhotoID = photoid
 
 	// prendo l'username dal path
 	username = ps.ByName("likeid")
@@ -77,11 +77,11 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// assegno l'id e l'username all'oggetto like
-	like.Owner_photo = userID
-	like.Username_owner = username
+	like.Ownerphoto = userID
+	like.Usernameowner = username
 
 	// verifico se il lije che si vuole aggiungere già esiste
-	exist, err := rt.db.CheckLikeExists(like.User_id, like.Photo_id)
+	exist, err := rt.db.CheckLikeExists(like.UserID, like.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -93,7 +93,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// aggiungo il like al database
-	err = rt.db.AddLike(like.User_id, like.Photo_id)
+	err = rt.db.AddLike(like.UserID, like.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -131,7 +131,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// assegno all'oggetto like l'user id dell'utente
-	like.User_id = userID
+	like.UserID = userID
 
 	// prendo l'id della photo dal path
 	photoid, err := strconv.ParseUint(ps.ByName("photoid"), 10, 64)
@@ -153,7 +153,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// assegno l'id della photo all'oggetto like
-	like.Photo_id = photoid
+	like.PhotoID = photoid
 
 	// prendo l'username dal path
 	username = ps.ByName("likeid")
@@ -171,10 +171,10 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// assegno l'id dell'utente all'oggetto like
-	like.Owner_photo = userID
+	like.Ownerphoto = userID
 
 	// verifico se il like che si vuole levare esiste
-	exist, err := rt.db.CheckLikeExists(like.User_id, like.Photo_id)
+	exist, err := rt.db.CheckLikeExists(like.UserID, like.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -186,7 +186,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// rimuovo il like
-	err = rt.db.DeleteLike(like.User_id, like.Photo_id)
+	err = rt.db.DeleteLike(like.UserID, like.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

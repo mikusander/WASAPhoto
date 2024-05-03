@@ -76,7 +76,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	// creo l'oggetto myProfile
 	var myProfile MyProfile
 
-	//creo l'oggetto User
+	// creo l'oggetto User
 	var user User
 
 	// prendo l'username dal path
@@ -146,7 +146,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	// creo l'oggetto my stream
 	var myStream MyStream
 
-	//creo l'oggetto User
+	// creo l'oggetto User
 	var user User
 
 	// prendo l'username dal path

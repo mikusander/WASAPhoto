@@ -9,11 +9,13 @@ import (
 */
 )
 
+// User rappresenta un utente nel sistema.
 type User struct {
 	ID       uint64 `json:"ID"`
 	Username string `json:"username"`
 }
 
+// Photo rappresenta una foto del sistema
 type Photo struct {
 	ID             uint64 `json:"ID"`
 	Date           string `json:"Date"`

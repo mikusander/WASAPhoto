@@ -36,7 +36,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// assegno l'user id all'oggetto comment
-	comment.User_id = userID
+	comment.UserID = userID
 
 	// prendo l'id della photo dal path
 	photoid, err := strconv.ParseUint(ps.ByName("photoid"), 10, 64)
@@ -58,7 +58,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// assegno l'id della photo all'oggetto comment
-	comment.Photo_id = photoid
+	comment.PhotoID = photoid
 
 	// decodifico il body e metto i campi dentro comment
 	err = json.NewDecoder(r.Body).Decode(&comment)
@@ -80,7 +80,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	comment.Date = dateString
 
 	// aggiungo al database il nuovo commento
-	comment.ID, err = rt.db.AddComment(comment.Date, comment.Text, comment.User_id, comment.Photo_id)
+	comment.ID, err = rt.db.AddComment(comment.Date, comment.Text, comment.UserID, comment.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -107,30 +107,30 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// assegno l'id dell'utebte all'oggetto comment
-	comment.User_id = userID
+	comment.UserID = userID
 
 	// verifico se l'utente esiste
-	if comment.User_id == 0 {
+	if comment.UserID == 0 {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	// eseguo il controllo di sicurezza
-	err = autentification(r.Header.Get("Authorization"), comment.User_id)
+	err = autentification(r.Header.Get("Authorization"), comment.UserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	// prendo dal path l'id della photo
-	comment.Photo_id, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
+	comment.PhotoID, err = strconv.ParseUint(ps.ByName("photoid"), 10, 64)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// verifico se la photo che vuole commentare esiste
-	exist, err := rt.db.CheckPhotoExists(comment.Photo_id)
+	exist, err := rt.db.CheckPhotoExists(comment.PhotoID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

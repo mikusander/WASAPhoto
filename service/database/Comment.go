@@ -52,11 +52,11 @@ func (db *appdbimpl) DeleteComment(id uint64) error {
 	return nil
 }
 
-func (db *appdbimpl) CommentCounterPhoto(photo_id uint64) (uint64, error) {
+func (db *appdbimpl) CommentCounterPhoto(photoid uint64) (uint64, error) {
 	// Eseguire una query per contare il numero di commenti ha una photo
 	query := `SELECT COUNT(*) FROM Comment WHERE photo_id = ?`
 	var exist int
-	err := db.c.QueryRow(query, photo_id).Scan(&exist)
+	err := db.c.QueryRow(query, photoid).Scan(&exist)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query
 		return 0, err
