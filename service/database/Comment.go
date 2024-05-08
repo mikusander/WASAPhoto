@@ -1,7 +1,5 @@
 package database
 
-import ()
-
 func (db *appdbimpl) AddComment(Date string, Text string, userID uint64, photoID uint64) (uint64, error) {
 	// Esegui una query per inserire il nuovo commento nella tabella dei commenti
 	query := `INSERT INTO Comment (Date, Text, user_id, photo_id) VALUES (?, ?, ?, ?)`

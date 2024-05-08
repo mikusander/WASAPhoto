@@ -1,7 +1,5 @@
 package database
 
-import ()
-
 func (db *appdbimpl) CheckFollow(PersonaleUserID string, FollowUserID string) (bool, error) {
 	// Eseguire una query per verificare se l'utente segue l'altro utente
 	query := `SELECT COUNT(*) FROM Follow WHERE personal_user_id = ? and follow_user_id = ?`

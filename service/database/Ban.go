@@ -1,7 +1,5 @@
 package database
 
-import ()
-
 func (db *appdbimpl) CheckBan(PersonaleUserID string, BanUserID string) (bool, error) {
 	// Eseguire una query per verificare se l'username ha già bannato l'altro utente
 	query := `SELECT COUNT(*) FROM Ban WHERE personal_user_id = ? and ban_user_id = ?`

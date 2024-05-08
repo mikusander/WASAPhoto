@@ -1,7 +1,5 @@
 package database
 
-import ()
-
 func (db *appdbimpl) AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error) {
 	// Esegui una query per inserire la nuova photo nella tabella delle photo
 	query := `INSERT INTO Photo (Date, Text, image, user_id) VALUES (?, ?, ?, ?)`

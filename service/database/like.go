@@ -1,7 +1,5 @@
 package database
 
-import ()
-
 func (db *appdbimpl) AddLike(userid uint64, photoid uint64) error {
 	// Esegui una query per inserire il nuovo like nella tabella dei like
 	query := `INSERT INTO like (user_id, photo_id) VALUES (?, ?)`

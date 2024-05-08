@@ -7,17 +7,16 @@ export default {}
 
 <template>
 
-	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">Example App</a>
-		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
+	<header class="navbar navbar-dark sticky-top bg-dark" style="height: 80px;">
+		<div class="d-flex justify-content-center w-100">
+			<a href="#/" style="text-decoration: none; color: orangered; font-size: 50px; font-weight: bold;">WASA Photo</a>
+		</div>
 	</header>
 
-	<div class="container-fluid">
-		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky">
+	<div class="container-fluid bg-dark">
+		<div class="row bg-dark">
+			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+				<div class="position-sticky pt-3 sidebar-sticky bg-dark">
 					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
 						<span>General</span>
 					</h6>
@@ -41,10 +40,6 @@ export default {}
 							</RouterLink>
 						</li>
 					</ul>
-
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-						<span>Secondary menu</span>
-					</h6>
 					<ul class="nav flex-column">
 						<li class="nav-item">
 							<RouterLink :to="'/some/' + 'variable_here' + '/path'" class="nav-link">
@@ -56,7 +51,7 @@ export default {}
 				</div>
 			</nav>
 
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-dark">
 				<RouterView />
 			</main>
 		</div>

@@ -58,3 +58,14 @@
 	stroke-linejoin: round;
 	fill: none;
 }
+
+.bg-orange {
+    background-color: rgb(204, 85, 0); /* Imposta un arancione più scuro */
+    /* Puoi regolare i valori dei canali RGB per ottenere la tonalità desiderata */
+}
+
+/* Imposta il testo bianco */
+.text-white {
+    color: white;
+}
+

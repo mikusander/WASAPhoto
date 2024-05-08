@@ -1,14 +1,5 @@
 package database
 
-import (
-/*
-"encoding/json"
-"fmt"
-"net/http"
-"strconv"
-*/
-)
-
 // User rappresenta un utente nel sistema.
 type User struct {
 	ID       uint64 `json:"ID"`
