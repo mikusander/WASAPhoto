@@ -7,6 +7,7 @@ export default {}
 
 <template>
 
+	<!--
 	<header class="navbar navbar-dark sticky-top bg-dark" style="height: 80px;">
 		<div class="d-flex justify-content-center w-100">
 			<a href="#/" style="text-decoration: none; color: orangered; font-size: 50px; font-weight: bold;">WASA Photo</a>
@@ -51,7 +52,11 @@ export default {}
 				</div>
 			</nav>
 
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-dark">
+		</div>
+	</div> -->
+	<div class="container-fluid bg-dark">
+		<div class="row justify-content-center align-items-center">
+			<main>
 				<RouterView />
 			</main>
 		</div>

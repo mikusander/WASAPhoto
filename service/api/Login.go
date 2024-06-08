@@ -29,6 +29,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+
 	// se l'utente non esiste lo creo
 	if id == 0 {
 		id, error = rt.db.CreateUser(user.Username)
@@ -43,5 +44,5 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(user.ID)
+	_ = json.NewEncoder(w).Encode(user)
 }
