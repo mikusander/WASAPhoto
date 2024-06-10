@@ -27,13 +27,13 @@ export default {
 		
         }
         catch(e){
-			if (e.response && e.response.status === 400) {
-				this.errormsg = "Form error, please check all fields and try again";
-			}else if(e.response && e.response.status === 500){
-				this.errormsg = "Server error, please try again later";
-			}else{
-				this.errormsg = e.toString();
-			}
+          if (e.response && e.response.status === 400) {
+            this.errormsg = "Form error, please check all fields and try again";
+          }else if(e.response && e.response.status === 500){
+            this.errormsg = "Server error, please try again later";
+          }else{
+            this.errormsg = e.toString();
+          }
         }		
       }
     },

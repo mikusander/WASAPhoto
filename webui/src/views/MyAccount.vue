@@ -3,7 +3,7 @@
       <header class="navbar navbar-dark sticky-top bg-dark" style="height: 80px;">
         <div class="container-fluid d-flex justify-content-between align-items-center">
           <div>
-            <button @click="NewPhoto" class="btn btn-light rounded-pill" style="margin-left: 20px; font-size: 20px; font-weight: bold;">+ Post</button>
+            <button @click="newPhoto" class="btn btn-light rounded-pill" style="margin-left: 20px; font-size: 20px; font-weight: bold;">+ Post</button>
           </div>
           <div class="mx-auto text-center">
             <a @click="homePage" style="color: orangered; font-size: 70px; font-weight: bold; cursor: pointer;">WASA Photo</a>
@@ -41,6 +41,9 @@
 		},
         async homePage() {
 			this.$router.push({path: '/users/'+this.user.Username+'/stream'})
+		},
+        async newPhoto() {
+			this.$router.push({path: '/users/'+this.user.Username+'/newPhoto'})
 		},
     },
   };
