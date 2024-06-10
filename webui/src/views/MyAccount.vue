@@ -37,7 +37,9 @@
                     <div class="photo-wrapper">
                         <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
                         <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
-                        <button @click="deletePhoto(photo.ID)" class="btn btn-danger mt-2">Elimina</button>
+                        <button @click="deletePhoto(photo.ID)" class="btn mt-2" style="background-color: orangered;">
+                            <img src="../images/bucket.png" style="width: 20px; height: 20px;">
+                        </button>
                     </div>
                 </div>
             </div>
@@ -195,7 +197,7 @@
   display: inline-block;
   border: 2px solid #ccc; /* Aggiungi un bordo per un effetto più definito */
   width: 500px; /* Imposta una larghezza fissa */
-  height: 500px; /* Imposta un'altezza fissa */
+  height: auto; /* Imposta un'altezza fissa */
   overflow: hidden; /* Nasconde l'eccesso dell'immagine se esce dal riquadro */
 }
 
@@ -210,17 +212,6 @@
   margin-top: 10px;
   font-size: 14px;
   color: black;
-}
-
-button.btn-danger {
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  background-color: red;
-  cursor: pointer;
 }
 </style>
 

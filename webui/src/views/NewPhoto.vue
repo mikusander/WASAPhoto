@@ -218,7 +218,7 @@
     display: inline-block;
     border: 2px solid #ccc; /* Aggiungi un bordo per un effetto più definito */
     width: 300px; /* Imposta una larghezza fissa */
-    height: 300px; /* Imposta un'altezza fissa */
+    height: auto; /* Imposta un'altezza fissa */
     overflow: hidden; /* Nasconde l'eccesso dell'immagine se esce dal riquadro */
 }
 .img {
