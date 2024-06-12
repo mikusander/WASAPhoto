@@ -29,7 +29,6 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-
 	// se l'utente non esiste lo creo
 	if id == 0 {
 		id, error = rt.db.CreateUser(user.Username)

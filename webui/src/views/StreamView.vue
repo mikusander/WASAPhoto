@@ -6,9 +6,12 @@
           <span style="color: orangered; font-size: 70px; font-weight: bold; cursor: default;">WASA Photo</span>
         </div>
         <div class="d-flex align-items-center">
-          <a @click="doLogout" style="text-decoration: none; color: white; font-size: 30px; font-weight: bold; margin-left: auto; cursor: pointer;">log out</a>
+          <a @click="doLogout"
+            style="text-decoration: none; color: white; font-size: 30px; font-weight: bold; margin-left: auto; cursor: pointer;">log
+            out</a>
           <a @click="myAccount" class="text-white" style="margin-left: 20px;">
-            <img src="../images/utente.png" alt="User Image" style="width: 70px; height: 70px; border-radius: 50%; cursor: pointer;">
+            <img src="../images/utente.png" alt="User Image"
+              style="width: 70px; height: 70px; border-radius: 50%; cursor: pointer;">
           </a>
         </div>
       </div>
@@ -35,13 +38,13 @@ export default {
   },
   methods: {
     async doLogout() {
-			localStorage.removeItem("token")
-			localStorage.removeItem("username")
-			this.$router.push({path: '/'})
-		},
+      localStorage.removeItem("token")
+      localStorage.removeItem("username")
+      this.$router.push({ path: '/' })
+    },
     async myAccount() {
-			this.$router.push({path: '/users/'+this.user.Username+'/MyAccount'})
-		},
+      this.$router.push({ path: '/users/' + this.user.Username + '/MyAccount' })
+    },
   },
 };
 </script>
@@ -55,5 +58,4 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-</style>
+}</style>

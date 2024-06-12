@@ -243,6 +243,24 @@ paths:
         description: user username that receives like
         schema: {$ref: "#/components/schemas/User/properties/username"}
 
+    get:
+      security:
+        - bearerAuth: []
+      tags: 
+        - like
+      summary: Like photo
+      description: |
+        This endpoint is used to put like.
+      operationId: isLikePhoto
+      responses:
+        "200":
+          description: like exist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/like" }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     put:
       security:
         - bearerAuth: []

@@ -34,6 +34,7 @@ func (rt *_router) Handler() http.Handler {
 	// like
 	rt.router.PUT("/users/:username/photo/:photoid/like/:likeid", rt.wrap(rt.likePhoto))
 	rt.router.DELETE("/users/:username/photo/:photoid/like/:likeid", rt.wrap(rt.unlikePhoto))
+	rt.router.GET("/users/:username/photo/:photoid/like/:likeid", rt.wrap(rt.isLikePhoto))
 
 	// Register routes
 	rt.router.GET("/", rt.getHelloWorld)

@@ -1,218 +1,298 @@
 <template>
     <div>
-      <header class="navbar navbar-dark sticky-top bg-dark" style="height: 100px;">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-          <div>
-            <button @click="newPhoto" class="btn btn-light rounded-pill" style="margin-left: 20px; font-size: 20px; font-weight: bold;">+ Post</button>
-          </div>
-          <div class="mx-auto text-center">
-            <a @click="homePage" style="color: orangered; font-size: 70px; font-weight: bold; cursor: pointer;">WASA Photo</a>
-          </div>
-          <div class="d-flex align-items-center ml-auto">
-            <a @click="doLogout" style="text-decoration: none; color: white; font-size: 30px; font-weight: bold; margin-right: 20px; cursor: pointer;">log out</a>
-          </div>
+        <header class="navbar navbar-dark sticky-top bg-dark" style="height: 100px;">
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <div>
+                    <button @click="newPhoto" class="btn btn-light rounded-pill"
+                        style="margin-left: 20px; font-size: 20px; font-weight: bold;">+ Post</button>
+                </div>
+                <div class="mx-auto text-center">
+                    <a @click="homePage" style="color: orangered; font-size: 70px; font-weight: bold; cursor: pointer;">WASA
+                        Photo</a>
+                </div>
+                <div class="d-flex align-items-center ml-auto">
+                    <a @click="doLogout"
+                        style="text-decoration: none; color: white; font-size: 30px; font-weight: bold; margin-right: 20px; cursor: pointer;">log
+                        out</a>
+                </div>
+            </div>
+        </header>
+        <div class="user-info">
+            <div class="num-info">
+                <span style="cursor: default;">{{ user.Username }}</span>
+            </div>
+            <div class="num-info">
+                <span style="cursor: default;">{{ profile.NumPhoto }}</span>
+                <span style="cursor: default;">Numero di foto</span>
+            </div>
+            <div class="num-info">
+                <span style="cursor: default;">{{ profile.NumFollow }}</span>
+                <span style="cursor: default;">Seguiti</span>
+            </div>
+            <div class="num-info">
+                <span style="cursor: default;">{{ profile.NumFollowing }}</span>
+                <span style="cursor: default;">Seguaci</span>
+            </div>
         </div>
-      </header>
-      <div class="user-info">
-        <div class="num-info">
-            <span style="cursor: default;">{{ user.Username }}</span>
-        </div>
-        <div class="num-info">
-            <span style="cursor: default;">{{ profile.NumPhoto }}</span>
-            <span style="cursor: default;">Numero di foto</span>
-        </div>
-        <div class="num-info">
-            <span style="cursor: default;">{{ profile.NumFollow }}</span>
-            <span style="cursor: default;">Seguiti</span>
-        </div>
-        <div class="num-info">
-            <span style="cursor: default;">{{ profile.NumFollowing }}</span>
-            <span style="cursor: default;">Seguaci</span>
-        </div>
-        </div>
-      <div class="container">
-        <div class="photo-gallery">
-            <div class="gallery">
-                <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
-                    <div class="photo-wrapper">
-                        <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
-                        <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
-                        <button @click="deletePhoto(photo.ID)" class="btn mt-2" style="background-color: orangered;">
-                            <img src="../images/bucket.png" style="width: 20px; height: 20px;">
-                        </button>
+        <div class="container">
+            <div class="photo-gallery" v-if="profile.ListPhoto.length > 0">
+                <div class="gallery">
+                    <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
+                        <div class="photo-wrapper">
+                            <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
+                            <p style="color: black; font-weight: bold;">Date: {{ photo.Date }}</p>
+                            <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
+                            <p style="color: black; font-weight: bold;">Like: {{ photo.likeCounter }}</p>
+                            <button @click="toggleLike(photo)" class="btn mt-2" :class="{ 'liked': photo.liked }"
+                                style="background-color: transparent; border: none;">
+                                <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked"
+                                    style="height: 30px; width: 30px;">
+                                <img v-else src="../images/heartWhite.png" alt="Not Liked"
+                                    style="height: 30px; width: 30px;">
+                            </button>
+                            <button @click="deletePhoto(photo.ID)" class="btn mt-2" style="background-color: orangered;">
+                                <img src="../images/bucket.png" style="width: 20px; height: 20px;">
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div v-else style="text-align: center; color: white;">
+                <p>Nessuna foto disponibile</p>
+            </div>
+            <!-- Messaggio di errore -->
+            <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
         </div>
-        <!-- Messaggio di errore -->
-        <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-      </div>
     </div>
-  </template>
-
+</template>
   
 <script>
-    export default {
+export default {
     data() {
         return {
-        errormsg: null,
-        loading: false,
-        some_data: null,
-        user: {
-            ID: localStorage.getItem("token"),
-            Username: localStorage.getItem("username"),
-        },
-        profile: {
-            NumFollow: 0,
-            NumFollowing: 0,
-            NumPhoto: 0,
-            ListPhoto: [
-            {
-                ID: 0,
-                Date: "",
-                Text: "",
-                URL: "",
-                LikeCounter: 0,
-                CommentCounter: 0,
-                UserID: 0,
-            }
-            ],
-            UserOwner: {
-            ID: 0,
-            Username: "",
+            errormsg: null,
+            loading: false,
+            some_data: null,
+            user: {
+                ID: localStorage.getItem("token"),
+                Username: localStorage.getItem("username"),
             },
-        }
+            profile: {
+                NumFollow: 0,
+                NumFollowing: 0,
+                NumPhoto: 0,
+                ListPhoto: []
+            }
         };
     },
     methods: {
         async doLogout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        this.$router.push({ path: '/' });
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            this.$router.push({ path: '/' });
         },
         async homePage() {
-        this.$router.push({ path: '/users/' + this.user.Username + '/stream' });
+            this.$router.push({ path: '/users/' + this.user.Username + '/stream' });
         },
         async newPhoto() {
-        this.$router.push({ path: '/users/' + this.user.Username + '/newPhoto' });
+            this.$router.push({ path: '/users/' + this.user.Username + '/newPhoto' });
         },
         async getProfile() {
-        try {
-            const response = await this.$axios.get("/users/" + this.user.Username + "/profile",
-            { headers: { Authorization: `Bearer ${this.user.ID}` } }
-            );
-            this.profile = response.data;
-            this.errormsg = null; // Resetta il messaggio di errore
-            this.$router.push({ path: '/users/' + this.user.Username + '/MyAccount' });
-        } catch (e) {
-            if (e.response && e.response.status === 400) {
-            this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
-            } else if (e.response && e.response.status === 500) {
-            this.errormsg = "Errore del server, riprova più tardi";
-            } else {
-            this.errormsg = e.toString();
+            try {
+                const response = await this.$axios.get("/users/" + this.user.Username + "/profile",
+                    { headers: { Authorization: `Bearer ${this.user.ID}` } }
+                );
+                this.profile = response.data;
+                if (this.profile.ListPhoto != null) {
+                    for (let i = 0; i < this.profile.ListPhoto.length; i++) {
+                        try {
+                            const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
+                                headers: { Authorization: `Bearer ${this.user.ID}` }
+                            });
+                            let like = isLike.data;
+                            if (like.User_id == 0) {
+                                this.profile.ListPhoto[i].liked = false;
+                            }
+                            else {
+                                this.profile.ListPhoto[i].liked = true;
+                            }
+                            this.errormsg = null;
+                        } catch (e) {
+                            if (e.response && e.response.status === 400) {
+                                this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                            } else if (e.response && e.response.status === 500) {
+                                this.errormsg = "Errore del server, riprova più tardi";
+                            } else {
+                                this.errormsg = e.toString();
+                            }
+                        }
+                    }
+                }
+                else{
+                    this.profile.ListPhoto = [];
+                }
+
+                this.errormsg = null; // Resetta il messaggio di errore
+                this.$router.push({ path: '/users/' + this.user.Username + '/MyAccount' });
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
             }
-        }
         },
         async deletePhoto(photoID) {
-        try {
-            await this.$axios.delete(`/users/${this.user.Username}/photo/${photoID}`, {
-            headers: { Authorization: `Bearer ${this.user.ID}` }
-            });
-            this.profile.ListPhoto = this.profile.ListPhoto.filter(photo => photo.ID !== photoID);
-            this.errormsg = null; // Resetta il messaggio di errore
-            this.profile.NumPhoto--;
-        } catch (e) {
-            if (e.response && e.response.status === 400) {
-            this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
-            } else if (e.response && e.response.status === 500) {
-            this.errormsg = "Errore del server, riprova più tardi";
-            } else {
-            this.errormsg = e.toString();
+            try {
+                await this.$axios.delete(`/users/${this.user.Username}/photo/${photoID}`, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.profile.ListPhoto = this.profile.ListPhoto.filter(photo => photo.ID !== photoID);
+                this.errormsg = null; // Resetta il messaggio di errore
+                this.profile.NumPhoto--;
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
             }
-        }
+        },
+        async toggleLike(photo) {
+            photo.liked = !photo.liked; // Cambia lo stato del like
+            photo.likeCounter += photo.liked ? 1 : -1; // Aggiorna il contatore dei like localmente
+
+            if (photo.liked) {
+                try {
+                    await this.$axios.put(`/users/${this.user.Username}/photo/${photo.ID}/like/${this.user.Username}`, {}, {
+                        headers: {
+                            Authorization: "Bearer " + this.user.ID
+                        }
+                    });
+                } catch (e) {
+                    photo.liked = false; // Ripristina lo stato precedente in caso di errore
+                    photo.likeCounter -= 1; // Ripristina il contatore dei like in caso di errore
+
+                    if (e.response && e.response.status === 400) {
+                        this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                    } else if (e.response && e.response.status === 500) {
+                        this.errormsg = "Errore del server, riprova più tardi";
+                    } else {
+                        this.errormsg = e.toString();
+                    }
+                }
+            } else {
+                try {
+                    await this.$axios.delete(`/users/${this.user.Username}/photo/${photo.ID}/like/${this.user.Username}`, {
+                        headers: { Authorization: `Bearer ${this.user.ID}` }
+                    });
+                } catch (e) {
+                    photo.liked = true; // Ripristina lo stato precedente in caso di errore
+                    photo.likeCounter += 1; // Ripristina il contatore dei like in caso di errore
+
+                    if (e.response && e.response.status === 400) {
+                        this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                    } else if (e.response && e.response.status === 500) {
+                        this.errormsg = "Errore del server, riprova più tardi";
+                    } else {
+                        this.errormsg = e.toString();
+                    }
+                }
+            }
         },
     },
     mounted() {
         this.getProfile();
     }
-    };
+};
 </script>
 
-  
- <style scoped>
+<style scoped>
 .user-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  text-align: center;
-  width: 100%;
-  height: 100px;
-  margin-top: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    width: 100%;
+    height: 100px;
+    margin-top: 60px;
 }
 
 .num-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200px; /* Modifica la larghezza in base alle tue esigenze */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    /* Modifica la larghezza in base alle tue esigenze */
 }
 
 .num-info span {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
 }
+
 .container {
-  color: white;
-  min-height: calc(100vh - 220px);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    color: white;
+    min-height: calc(100vh - 220px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
+
 .photo-gallery {
-  text-align: center;
-  color: white;
+    text-align: center;
+    color: white;
 }
 
 .gallery {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .photo {
-  margin: 20px;
-  text-align: center;
+    margin: 20px;
+    text-align: center;
 }
 
 .photo-wrapper {
-  background-color: white;
-  border-radius: 15px;
-  padding: 30px; /* Aumenta il padding per rendere lo sfondo più grosso */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: inline-block;
-  border: 2px solid #ccc; /* Aggiungi un bordo per un effetto più definito */
-  width: 500px; /* Imposta una larghezza fissa */
-  height: auto; /* Imposta un'altezza fissa */
-  overflow: hidden; /* Nasconde l'eccesso dell'immagine se esce dal riquadro */
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    /* Aumenta il padding per rendere lo sfondo più grosso */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    border: 2px solid #ccc;
+    /* Aggiungi un bordo per un effetto più definito */
+    width: 500px;
+    /* Imposta una larghezza fissa */
+    height: auto;
+    /* Imposta un'altezza fissa */
+    overflow: hidden;
+    /* Nasconde l'eccesso dell'immagine se esce dal riquadro */
 }
 
 .photo img {
-  width: 100%; /* Rende l'immagine larga quanto il contenitore */
-  height: 100%; /* Rende l'immagine alta quanto il contenitore */
-  object-fit: cover; /* Ritaglia l'immagine per riempire il contenitore mantenendo il centro */
-  border-radius: 10px;
+    width: 100%;
+    /* Rende l'immagine larga quanto il contenitore */
+    height: 100%;
+    /* Rende l'immagine alta quanto il contenitore */
+    object-fit: cover;
+    /* Ritaglia l'immagine per riempire il contenitore mantenendo il centro */
+    border-radius: 10px;
 }
 
 .photo p {
-  margin-top: 10px;
-  font-size: 14px;
-  color: black;
+    margin-top: 10px;
+    font-size: 14px;
+    color: black;
 }
 </style>
-
-  
