@@ -12,14 +12,14 @@ type User struct {
 
 // Photo rappresenta una foto del sistema
 type Photo struct {
-	ID             uint64 `json:"ID"`
-	Date           string `json:"Date"`
-	Text           string `json:"Text"`
-	URL            []byte `json:"URL"`
-	LikeCounter    uint64 `json:"LikeCounter"`
-	CommentCounter uint64 `json:"CommentCounter"`
-	UserID         uint64 `json:"UserID"`
-	ListComment	   []database.Comment `json:"ListComment"`
+	ID             uint64             `json:"ID"`
+	Date           string             `json:"Date"`
+	Text           string             `json:"Text"`
+	URL            []byte             `json:"URL"`
+	LikeCounter    uint64             `json:"LikeCounter"`
+	CommentCounter uint64             `json:"CommentCounter"`
+	UserID         uint64             `json:"UserID"`
+	ListComment    []database.Comment `json:"ListComment"`
 }
 
 // Follow rappresenta un follow del sistema
