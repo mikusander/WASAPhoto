@@ -104,6 +104,29 @@ paths:
         "400": { $ref: '#/components/responses/BadRequest' }
         "500": { $ref: "#/components/responses/InternalServerError" }
 
+  /users/{username}/id:
+    parameters: 
+      - name: username
+        in: path
+        required: true
+        description: user username
+        schema: {$ref: "#/components/schemas/User/properties/username"}
+
+    get:
+      tags: 
+        - user
+      summary: Like photo
+      description: |
+        This endpoint is used to put like.
+      operationId: getIDUser
+      responses:
+        "200":
+          description: user exist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
   /users/{username}/photo:
     parameters:

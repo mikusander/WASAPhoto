@@ -14,6 +14,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:username/username", rt.wrap(rt.setMyUserName))
 	rt.router.GET("/users/:username/profile", rt.wrap(rt.getUserProfile))
 	rt.router.GET("/users/:username/stream", rt.wrap(rt.getMyStream))
+	rt.router.GET("/users/:username/id", rt.wrap(rt.getIDUser))
 
 	// Photo
 	rt.router.POST("/users/:username/photo", rt.wrap(rt.uploadPhoto))

@@ -71,6 +71,36 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	_ = json.NewEncoder(w).Encode(user)
 }
 
+func (rt *_router) getIDUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// creo l'oggetto User
+	var user User
+
+	// prendo l'username dal path
+	username := ps.ByName("username")
+
+	// verifico se l'user esiste
+	userID, err := rt.db.CheckUserExists(username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// se non esiste ritorno errore
+	if userID == 0 {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	// assegno l'id e l'username all'oggetto utente
+	user.ID = userID
+	user.Username = username
+
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(user)
+
+}
+
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// creo l'oggetto myProfile
