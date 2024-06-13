@@ -49,8 +49,7 @@
                             <div>
                                 <button @click="toggleComments(photo)" class="btn mt-2"
                                     style="background-color: border: none;">
-                                    <p style="font-weight: bold;">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra
-                                                                            Commenti' }}</p>
+                                    <p style="font-weight: bold;">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
                                 </button>
                                 <div v-if="photo.showComments" class="comments">
                                     <div v-for="comment in photo.listComment" :key="comment.ID"
