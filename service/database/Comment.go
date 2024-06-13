@@ -50,6 +50,48 @@ func (db *appdbimpl) DeleteComment(id uint64) error {
 	return nil
 }
 
+func (db *appdbimpl) GetCommentList(photoid uint64) ([]Comment, error) {
+	// Eseguire una query per ottenere tutti i commenti associati alla foto
+	query := `SELECT * FROM Comment WHERE photo_id = ?`
+
+	rows, err := db.c.Query(query, photoid)
+	if err != nil {
+		// Si è verificato un errore durante l'esecuzione della query
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Creare una lista per contenere i commenti
+	var comments []Comment
+
+	// Iterare sui risultati della query
+	for rows.Next() {
+		var comment Comment
+		err := rows.Scan(&comment.ID, &comment.Text, &comment.Date, &comment.UserID, &comment.PhotoID)
+		if err != nil {
+			// Si è verificato un errore durante la scansione dei risultati
+			return nil, err
+		}
+
+		comment.UserUsername, err = db.GetUsernameFromID(comment.UserID)
+		if err != nil && comment.UserUsername == "" {
+			// Si è verificato un errore durante la scansione dei risultati
+			return nil, err
+		}
+
+		// Aggiungere il commento alla lista
+		comments = append(comments, comment)
+	}
+
+	// Controllare se si è verificato un errore durante l'iterazione
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// Restituire la lista dei commenti
+	return comments, nil
+}
+
 func (db *appdbimpl) CommentCounterPhoto(photoid uint64) (uint64, error) {
 	// Eseguire una query per contare il numero di commenti ha una photo
 	query := `SELECT COUNT(*) FROM Comment WHERE photo_id = ?`

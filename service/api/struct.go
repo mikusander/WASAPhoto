@@ -19,6 +19,7 @@ type Photo struct {
 	LikeCounter    uint64 `json:"LikeCounter"`
 	CommentCounter uint64 `json:"CommentCounter"`
 	UserID         uint64 `json:"UserID"`
+	ListComment	   []database.Comment `json:"ListComment"`
 }
 
 // Follow rappresenta un follow del sistema

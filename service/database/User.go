@@ -1,5 +1,9 @@
 package database
 
+import (
+	"database/sql"
+)
+
 func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
 	// Prepara la query di aggiornamento
 	query := "UPDATE User SET username = ? WHERE id = ?"
@@ -69,6 +73,24 @@ func (db *appdbimpl) GetFollowPerson(userID string) ([]uint64, error) {
 	return follow, nil
 }
 
+func (db *appdbimpl) GetUsernameFromID(id uint64) (string, error) {
+	// Eseguire una query per verificare se l'username esiste già nel database
+	query := `SELECT Username FROM User WHERE Id = ?`
+	var username string
+	err := db.c.QueryRow(query, id).Scan(&username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// L'utente non esiste nel database
+			return "", nil
+		}
+		// Si è verificato un errore durante l'esecuzione della query
+		return "", err
+	}
+
+	// L'utente esiste nel database
+	return username, nil
+}
+
 func (db *appdbimpl) GetListPhoto(userID uint64) ([]Photo, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
 	query := `SELECT * FROM Photo WHERE user_id = ?`
@@ -97,6 +119,12 @@ func (db *appdbimpl) GetListPhoto(userID uint64) ([]Photo, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		photo.ListComment, err = db.GetCommentList(photo.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		listPhoto = append(listPhoto, photo)
 	}
 

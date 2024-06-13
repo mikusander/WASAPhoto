@@ -43,6 +43,7 @@
                             <p style="color: black; font-weight: bold;">Date: {{ photo.Date }}</p>
                             <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
                             <p style="color: black; font-weight: bold;">Like: {{ photo.likeCounter }}</p>
+                            <p style="color: black; font-weight: bold;">Comment: {{ photo.commentCounter }}</p>
                             <button @click="toggleLike(photo)" class="btn mt-2" :class="{ 'liked': photo.liked }"
                                 style="background-color: transparent; border: none;">
                                 <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked"
@@ -50,9 +51,37 @@
                                 <img v-else src="../images/heartWhite.png" alt="Not Liked"
                                     style="height: 30px; width: 30px;">
                             </button>
+                            <button @click="photo.showCommentArea = !photo.showCommentArea" class="btn mt-2"
+                                style="background-color: transparent; border: none;">
+                                <img src="../images/comment.png" style="width: 30px; height: 30px;">
+                            </button>
                             <button @click="deletePhoto(photo.ID)" class="btn mt-2" style="background-color: orangered;">
                                 <img src="../images/bucket.png" style="width: 20px; height: 20px;">
                             </button>
+                            <div>
+                                <button @click="toggleComments(photo)" class="btn mt-2"
+                                    style="background-color: border: none;">
+                                    <p style="font-weight: bold;">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
+                                </button>
+                                <div v-if="photo.showComments" class="comments">
+                                    <div v-for="comment in photo.listComment" :key="comment.ID" style="display: flex; align-items: center;">
+                                        <div class="comment-content">
+                                            <p><strong>{{ comment.UserUsername }}:</strong> {{ comment.Text }}</p>
+                                        </div>
+                                        <button v-if="comment.User_id == this.user.ID" class="btn delete-button" @click="deleteComment(photo.ID, comment.ID)">
+                                            <img src="../images/bucket.png" alt="Delete" class="delete-icon">
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div v-if="photo.showCommentArea" class="comment-area">
+                                <textarea v-model="photo.newComment" rows="3" class="form-control mt-2"
+                                    placeholder="Scrivi un commento..."></textarea>
+                                <button @click="addComment(photo)" class="btn mt-2"
+                                    style="background-color: green; color: white;">Invia</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,7 +94,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 export default {
     data() {
@@ -86,6 +115,9 @@ export default {
         };
     },
     methods: {
+        async toggleComments(photo) {
+            photo.showComments = !photo.showComments;
+        },
         async doLogout() {
             localStorage.removeItem("token");
             localStorage.removeItem("username");
@@ -105,6 +137,7 @@ export default {
                 this.profile = response.data;
                 if (this.profile.ListPhoto != null) {
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {
+                        console.log(this.profile.ListPhoto[i])
                         try {
                             const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
                                 headers: { Authorization: `Bearer ${this.user.ID}` }
@@ -117,6 +150,9 @@ export default {
                                 this.profile.ListPhoto[i].liked = true;
                             }
                             this.errormsg = null;
+                            // Aggiungi una proprietà per gestire la visualizzazione dei commenti
+                            this.profile.ListPhoto[i].showComments = false;
+                            // Aggiungi una proprietà per memorizzare i commenti relativi ad ogni foto
                         } catch (e) {
                             if (e.response && e.response.status === 400) {
                                 this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -128,7 +164,7 @@ export default {
                         }
                     }
                 }
-                else{
+                else {
                     this.profile.ListPhoto = [];
                 }
 
@@ -162,13 +198,29 @@ export default {
                 }
             }
         },
+        async deleteComment(photoID, commentID) {
+            try {
+                await this.$axios.delete(`/users/${this.user.Username}/photo/${photoID}/comment/${commentID}`, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.errormsg = null; // Resetta il messaggio di errore
+                this.getProfile();
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        },
         async toggleLike(photo) {
             photo.liked = !photo.liked; // Cambia lo stato del like
-            photo.likeCounter += photo.liked ? 1 : -1; // Aggiorna il contatore dei like localmente
-
+            photo.likeCounter += photo.liked ? 1 : -1; // Aggiorna il contatore dei like
             if (photo.liked) {
                 try {
-                    await this.$axios.put(`/users/${this.user.Username}/photo/${photo.ID}/like/${this.user.Username}`, {}, {
+                    let response = await this.$axios.put('/users/' + this.user.Username + '/photo/' + photo.ID + '/like/' + this.user.Username, {}, {
                         headers: {
                             Authorization: "Bearer " + this.user.ID
                         }
@@ -176,7 +228,6 @@ export default {
                 } catch (e) {
                     photo.liked = false; // Ripristina lo stato precedente in caso di errore
                     photo.likeCounter -= 1; // Ripristina il contatore dei like in caso di errore
-
                     if (e.response && e.response.status === 400) {
                         this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
                     } else if (e.response && e.response.status === 500) {
@@ -193,7 +244,6 @@ export default {
                 } catch (e) {
                     photo.liked = true; // Ripristina lo stato precedente in caso di errore
                     photo.likeCounter += 1; // Ripristina il contatore dei like in caso di errore
-
                     if (e.response && e.response.status === 400) {
                         this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
                     } else if (e.response && e.response.status === 500) {
@@ -204,6 +254,32 @@ export default {
                 }
             }
         },
+        async addComment(photo) {
+            if (!photo.newComment) {
+                this.errormsg = "Il commento non può essere vuoto";
+                return;
+            }
+            try {
+                photo.commentCounter += 1;
+                await this.$axios.post(`/users/${this.user.Username}/photo/${photo.ID}/comment`, {
+                    Text: photo.newComment
+                }, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                photo.newComment = ""; // Pulisci l'area di testo del commento
+                photo.showCommentArea = false; // Nascondi l'area di testo dopo aver inviato il commento
+                this.errormsg = null; // Resetta il messaggio di errore
+                this.getProfile();
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        }
     },
     mounted() {
         this.getProfile();
@@ -212,6 +288,32 @@ export default {
 </script>
 
 <style scoped>
+
+.comment-wrapper {
+    display: flex; /* Utilizza Flexbox */
+    align-items: center; /* Allinea verticalmente al centro */
+}
+
+.comment-content {
+    flex: 1; /* Fai espandere il contenuto del commento per riempire lo spazio disponibile */
+    margin-right: 10px; /* Aggiungi uno spazio a destra tra il contenuto del commento e il pulsante */
+}
+
+.delete-button {
+    background-color: transparent; /* Imposta lo sfondo trasparente */
+    border: none; /* Rimuovi il bordo */
+    padding: 0; /* Rimuovi il padding */
+    cursor: pointer; /* Mostra il cursore come puntatore */
+    height: 20px;
+    width: 20px;
+}
+
+.delete-icon {
+    width: 20px;
+    height: 20px;
+}
+
+
 .user-info {
     display: flex;
     align-items: center;
@@ -295,4 +397,7 @@ export default {
     font-size: 14px;
     color: black;
 }
-</style>
+
+.comment-area {
+    margin-top: 10px;
+}</style>
