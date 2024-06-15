@@ -169,6 +169,24 @@ paths:
         description: follow user username
         schema: {$ref: "#/components/schemas/User/properties/username"}
 
+    get:
+      security:
+        - bearerAuth: []
+      tags: 
+        - like
+      summary: verify if user follow another user
+      description: |
+        This endpoint indicate if the user follw or unfollow another user.
+      operationId: isFollowUser
+      responses:
+        "200":
+          description: follow exist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/follow" }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     put:
       security:
         - bearerAuth: []
@@ -214,6 +232,24 @@ paths:
         required: true
         description: user username to ban
         schema: {$ref: "#/components/schemas/User/properties/username"}
+
+    get:
+      security:
+        - bearerAuth: []
+      tags: 
+        - ban
+      summary: check if exist ban
+      description: |
+        This endpoint indicates if the user is ban or unban.
+      operationId: isBanUser
+      responses:
+        "200":
+          description: ban exist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ban" }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
     put:
       security:

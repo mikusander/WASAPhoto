@@ -59,9 +59,8 @@
                                 <img src="../images/bucket.png" style="width: 20px; height: 20px;">
                             </button>
                             <div>
-                                <button @click="toggleComments(photo)" class="btn mt-2"
-                                    style="background-color: border: none;">
-                                    <p style="font-weight: bold;">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
+                                <button @click="toggleComments(photo)" class="btn mt-2" style="background: none; border: none; padding: 0;">
+                                    <p class="clickable-text">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
                                 </button>
                                 <div v-if="photo.showComments" class="comments">
                                     <div v-for="comment in photo.listComment" :key="comment.ID" style="display: flex; align-items: center;">
@@ -288,6 +287,16 @@ export default {
 </script>
 
 <style scoped>
+
+.clickable-text {
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.clickable-text:hover {
+    color: rgba(0, 0, 0, 0.5); /* Schiarisce il testo al passaggio del mouse */
+}
 
 .comment-wrapper {
     display: flex; /* Utilizza Flexbox */

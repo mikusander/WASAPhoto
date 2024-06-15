@@ -94,6 +94,72 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	_ = json.NewEncoder(w).Encode(ban)
 }
 
+func (rt *_router) isBanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	// creo l'oggetto ban
+	var ban Ban
+
+	// prendo l'username personale
+	ban.PersonalUserID = ps.ByName("username")
+
+	// verifico se l'username esiste
+	userID, err := rt.db.CheckUserExists(ban.PersonalUserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// se non esiste ritorno errore
+	if userID == 0 {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	// effettuo l'autentificazione
+	err = autentification(r.Header.Get("Authorization"), userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	// prendo l'username dell'utente da bannare
+	ban.BanUserID = ps.ByName("banid")
+
+	// verifico se l'utente esiste
+	userID, err = rt.db.CheckUserExists(ban.BanUserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// se non esiste ritorno errore
+	if userID == 0 {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	// verifico se l'utente sta cercando di bannare se stesso e ritorno errore in caso sia vero
+	if ban.PersonalUserID == ban.BanUserID {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// verifico se l'utente sia già bannato
+	isBan, err := rt.db.CheckBan(ban.PersonalUserID, ban.BanUserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// se è già bannato ritorno errore
+	if isBan == true {
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(ban)
+	} else {
+		ban.PersonalUserID = ""
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(ban)
+	}
+}
+
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// creo l'oggetto ban

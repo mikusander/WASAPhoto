@@ -2,15 +2,22 @@
     <div>
         <header class="navbar navbar-dark sticky-top bg-dark" style="height: 100px;">
             <div class="container-fluid d-flex justify-content-between align-items-center">
-                <div class="mx-auto text-center">
-                    <a @click="homePage" style="color: orangered; font-size: 70px; font-weight: bold; cursor: pointer;">WASA
-                        Photo</a>
+                <div class="mx-auto text-center ml-5">
+                    <a @click="homePage" style="color: orangered; font-size: 70px; font-weight: bold; cursor: pointer;">
+                        WASA Photo
+                    </a>
                 </div>
             </div>
         </header>
         <div class="user-info">
             <div class="num-info">
                 <span style="cursor: default;">{{ this.userProfile.Username }}</span>
+                <div style="margin-top: 20px;" class="d-flex align-items-center">
+                    <button v-if="!this.profile.isFollow" @click="followUser" class="bottone btn btn-success mr-4">Follow</button>
+                    <button v-else @click="unFollowUser" class="bottone btn btn-success mr-4">unFollow</button>
+                    <button v-if="!this.profile.isBan" @click="banUser" class="bottone btn btn-danger mr-4">Ban</button>
+                    <button v-else @click="unBanUser" class="bottone btn btn-danger mr-4">unBan</button>
+                </div>
             </div>
             <div class="num-info">
                 <span style="cursor: default;">{{ profile.NumPhoto }}</span>
@@ -26,7 +33,7 @@
             </div>
         </div>
         <div class="container">
-            <div class="photo-gallery" v-if="profile.ListPhoto.length > 0">
+            <div class="photo-gallery" v-if="(profile.ListPhoto.length > 0) && (!this.profile.isBan)">
                 <div class="gallery">
                     <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
                         <div class="photo-wrapper">
@@ -47,9 +54,8 @@
                                 <img src="../images/comment.png" style="width: 30px; height: 30px;">
                             </button>
                             <div>
-                                <button @click="toggleComments(photo)" class="btn mt-2"
-                                    style="background-color: border: none;">
-                                    <p style="font-weight: bold;">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
+                                <button @click="toggleComments(photo)" class="btn mt-2" style="background: none; border: none; padding: 0;">
+                                    <p class="clickable-text">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
                                 </button>
                                 <div v-if="photo.showComments" class="comments">
                                     <div v-for="comment in photo.listComment" :key="comment.ID"
@@ -93,7 +99,6 @@ export default {
             loading: false,
             some_data: null,
             userProfile: {
-
                 Username: this.$route.params.username,
             },
             user: {
@@ -104,11 +109,85 @@ export default {
                 NumFollow: 0,
                 NumFollowing: 0,
                 NumPhoto: 0,
-                ListPhoto: []
+                ListPhoto: [],
+                isFollow: false,
+                isBan: false,
             }
         };
     },
     methods: {
+        async followUser() {
+            try {
+                await this.$axios.put(`/users/${this.user.Username}/follow/${this.userProfile.Username}`, {}, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.errormsg = null;
+                this.getProfile(); // Aggiorna il profilo dopo aver seguito l'utente
+                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        },
+        async unFollowUser() {
+            try {
+                await this.$axios.delete(`/users/${this.user.Username}/follow/${this.userProfile.Username}`, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.errormsg = null;
+                this.getProfile(); // Aggiorna il profilo dopo aver seguito l'utente
+                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        },
+        async banUser() {
+            try {
+                await this.$axios.put(`/users/${this.user.Username}/ban/${this.userProfile.Username}`, {}, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.errormsg = null;
+                this.getProfile(); // Aggiorna il profilo dopo aver bannato l'utente
+                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        },
+        async unBanUser() {
+            try {
+                await this.$axios.delete(`/users/${this.user.Username}/ban/${this.userProfile.Username}`, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                this.errormsg = null;
+                this.getProfile(); // Aggiorna il profilo dopo aver bannato l'utente
+                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+            } catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Errore del server, riprova più tardi";
+                } else {
+                    this.errormsg = e.toString();
+                }
+            }
+        },
         async toggleComments(photo) {
             photo.showComments = !photo.showComments;
         },
@@ -125,6 +204,24 @@ export default {
                 let utente = response.data;
                 this.userProfile.ID = id.ID;
                 this.profile = response.data;
+                let responseFollow = await this.$axios.get("/users/" + this.user.Username + "/follow/" + this.userProfile.Username, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                let follow = responseFollow.data;
+                if (follow.PersonalUserId != "") {
+                    this.profile.isFollow = true;
+                } else {
+                    this.profile.isFollow = false;
+                }
+                let responseBan = await this.$axios.get("/users/" + this.user.Username + "/ban/" + this.userProfile.Username, {
+                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                });
+                let ban = responseBan.data;
+                if (ban.PersonalUserId != "") {
+                    this.profile.isBan = true;
+                } else {
+                    this.profile.isBan = false;
+                }
                 if (this.profile.ListPhoto != null) {
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {
                         console.log(this.profile.ListPhoto[i])
@@ -159,7 +256,7 @@ export default {
                 }
 
                 this.errormsg = null; // Resetta il messaggio di errore
-                this.$router.push({ path: '/users/' + this.username + '/profile' });
+                this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {
                 if (e.response && e.response.status === 400) {
                     this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -260,6 +357,45 @@ export default {
 </script>
 
 <style scoped>
+
+.clickable-text {
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.clickable-text:hover {
+    color: rgba(0, 0, 0, 0.5); /* Schiarisce il testo al passaggio del mouse */
+}
+
+.bottone {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: orangered;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  /* Imposta la larghezza del bottone */
+  max-width: 300px;
+  /* Larghezza massima del bottone */
+  border-radius: 10px;
+  /* Arrotonda i bordi del bottone */
+}
+.btn {
+    margin-right: 10px;
+    /* Aumenta il margine destro per più spazio */
+    border-radius: 50px;
+    /* Rendi i bordi completamente tondeggianti */
+}
+
+/* Specifica margine maggiore al contenitore dei pulsanti */
+.d-flex.align-items-center {
+    margin-right: 20px;
+    /* Aumenta il margine destro per più spazio */
+}
+
 .comment-wrapper {
     display: flex;
     /* Utilizza Flexbox */

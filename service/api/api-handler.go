@@ -23,10 +23,12 @@ func (rt *_router) Handler() http.Handler {
 	// follow
 	rt.router.PUT("/users/:username/follow/:followid", rt.wrap(rt.followUser))
 	rt.router.DELETE("/users/:username/follow/:followid", rt.wrap(rt.unfollowUser))
+	rt.router.GET("/users/:username/follow/:followid", rt.wrap(rt.isFollowUser))
 
 	// ban
 	rt.router.PUT("/users/:username/ban/:banid", rt.wrap(rt.banUser))
 	rt.router.DELETE("/users/:username/ban/:banid", rt.wrap(rt.unbanUser))
+	rt.router.GET("/users/:username/ban/:banid", rt.wrap(rt.isBanUser))
 
 	// comment
 	rt.router.POST("/users/:username/photo/:photoid/comment", rt.wrap(rt.commentPhoto))
