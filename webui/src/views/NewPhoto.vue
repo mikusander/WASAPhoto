@@ -45,6 +45,7 @@
                     <button type="submit" class="btn btn-primary btn-lg">Carica</button>
                 </form>
             </div>
+            <SuccessMsg v-if="successmsg" :msg="successmsg"></SuccessMsg>
             <!-- Messaggio di errore -->
             <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
         </div>
@@ -57,6 +58,7 @@ export default {
     data() {
         return {
             errormsg: null,
+            successmsg: null,
             loading: false,
             some_data: null,
             description: "",
@@ -103,6 +105,9 @@ export default {
         async homePage() {
             this.$router.push({ path: '/users/' + this.user.Username + '/stream' });
         },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
         async handleSubmit() {
             const fileInput = this.$refs.imageInput;
             const description = this.description;
@@ -120,6 +125,8 @@ export default {
                         );
                         this.photo = response.data;
                         this.errormsg = null; // Resetta il messaggio di errore
+                        this.successmsg = "foto caricata con successo";
+                        await this.sleep(1000);
                         this.$router.push({ path: '/users/' + this.user.Username + '/MyAccount' });
                     } catch (e) {
                         if (e.response && e.response.status === 400) {

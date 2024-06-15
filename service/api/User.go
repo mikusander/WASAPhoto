@@ -34,7 +34,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 	// se già esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 	// controllo se l'utente ha i permessi
@@ -87,7 +87,7 @@ func (rt *_router) getIDUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 	// se non esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	// se non esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 	// controllo se l'utente ha i permessi
@@ -138,14 +138,14 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	myProfile.UserOwner = user
 
 	// conto il nuomero di persone che seguono l'utente
-	myProfile.NumFollow, err = rt.db.CountFollow(userID)
+	myProfile.NumFollow, err = rt.db.CountFollow(user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// conto il numero di persone che segue l'utente
-	myProfile.NumFollowing, err = rt.db.CountFollowing(userID)
+	myProfile.NumFollowing, err = rt.db.CountFollowing(user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -190,7 +190,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	// se non esiste ritorno errore
 	if userID == 0 {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 	// controllo se l'utente ha i permessi

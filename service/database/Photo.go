@@ -70,7 +70,7 @@ func (db *appdbimpl) GetAllPhoto(listFollow []uint64) ([]Photo, error) {
 
 	for i := 0; i < len(listFollow); i++ {
 		// Eseguire una query per restituire tutte le photo
-		query := `SELECT * FROM Photo WHERE user_id = ?`
+		query := `SELECT * FROM Photo WHERE user_id = ? ORDER BY date DESC`
 		rows, err := db.c.Query(query, listFollow[i])
 		if err != nil {
 			// Si è verificato un errore durante l'esecuzione della query
@@ -95,6 +95,12 @@ func (db *appdbimpl) GetAllPhoto(listFollow []uint64) ([]Photo, error) {
 			if err != nil {
 				return nil, err
 			}
+
+			photo.ListComment, err = db.GetCommentList(photo.ID)
+			if err != nil {
+				return nil, err
+			}
+
 			listPhoto = append(listPhoto, photo)
 		}
 

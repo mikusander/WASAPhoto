@@ -16,11 +16,11 @@ func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
 	return nil
 }
 
-func (db *appdbimpl) CountFollow(userID uint64) (uint64, error) {
+func (db *appdbimpl) CountFollow(username string) (uint64, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
 	query := `SELECT COUNT(*) FROM Follow WHERE personal_user_id = ?`
 	var numFollow uint64
-	err := db.c.QueryRow(query, userID).Scan(&numFollow)
+	err := db.c.QueryRow(query, username).Scan(&numFollow)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query
 		return 0, err
@@ -28,11 +28,11 @@ func (db *appdbimpl) CountFollow(userID uint64) (uint64, error) {
 	return numFollow, err
 }
 
-func (db *appdbimpl) CountFollowing(userID uint64) (uint64, error) {
+func (db *appdbimpl) CountFollowing(username string) (uint64, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
 	query := `SELECT COUNT(*) FROM Follow WHERE follow_user_id = ?`
 	var numFollowing uint64
-	err := db.c.QueryRow(query, userID).Scan(&numFollowing)
+	err := db.c.QueryRow(query, username).Scan(&numFollowing)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query
 		return 0, err
@@ -93,7 +93,7 @@ func (db *appdbimpl) GetUsernameFromID(id uint64) (string, error) {
 
 func (db *appdbimpl) GetListPhoto(userID uint64) ([]Photo, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
-	query := `SELECT * FROM Photo WHERE user_id = ?`
+	query := `SELECT * FROM Photo WHERE user_id = ? ORDER BY date DESC`
 	rows, err := db.c.Query(query, userID)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query

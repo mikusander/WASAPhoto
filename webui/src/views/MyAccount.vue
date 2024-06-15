@@ -136,7 +136,6 @@ export default {
                 this.profile = response.data;
                 if (this.profile.ListPhoto != null) {
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {
-                        console.log(this.profile.ListPhoto[i])
                         try {
                             const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
                                 headers: { Authorization: `Bearer ${this.user.ID}` }

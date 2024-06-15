@@ -58,7 +58,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	now := time.Now()
 
 	// Converti la data in una stringa utilizzando un formato specifico
-	dateString := now.Format("2006-01-02") // Formato: "YYYY-MM-DD"
+	dateString := now.Format("2006-01-02 15:04:05") // Formato: "YYYY-MM-DD HH:MM:SS"
 
 	photo.Date = dateString
 

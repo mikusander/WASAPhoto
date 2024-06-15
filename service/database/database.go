@@ -80,8 +80,8 @@ type AppDatabase interface {
 	CommentCounterPhoto(photoid uint64) (uint64, error)
 
 	// My Profile
-	CountFollow(userID uint64) (uint64, error)
-	CountFollowing(userID uint64) (uint64, error)
+	CountFollow(username string) (uint64, error)
+	CountFollowing(username string) (uint64, error)
 
 	Ping() error
 }

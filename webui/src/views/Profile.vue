@@ -20,15 +20,15 @@
                 </div>
             </div>
             <div class="num-info">
-                <span style="cursor: default;">{{ profile.NumPhoto }}</span>
+                <span style="cursor: default;">{{ this.profile.NumPhoto }}</span>
                 <span style="cursor: default;">Numero di foto</span>
             </div>
             <div class="num-info">
-                <span style="cursor: default;">{{ profile.NumFollow }}</span>
+                <span style="cursor: default;">{{ this.profile.NumFollow }}</span>
                 <span style="cursor: default;">Seguiti</span>
             </div>
             <div class="num-info">
-                <span style="cursor: default;">{{ profile.NumFollowing }}</span>
+                <span style="cursor: default;">{{ this.profile.NumFollowing }}</span>
                 <span style="cursor: default;">Seguaci</span>
             </div>
         </div>
@@ -99,6 +99,7 @@ export default {
             loading: false,
             some_data: null,
             userProfile: {
+                ID: 0,
                 Username: this.$route.params.username,
             },
             user: {
@@ -222,9 +223,17 @@ export default {
                 } else {
                     this.profile.isBan = false;
                 }
+                let responseBanDue = await this.$axios.get("/users/" + this.userProfile.Username + "/ban/" + this.user.Username, {
+                    headers: { Authorization: `Bearer ${this.userProfile.ID}` }
+                });
+                let banDue = responseBan.data;
+                if (banDue.PersonalUserId != "") {
+                    this.profile.isBan = true;
+                } else {
+                    this.profile.isBan = false;
+                }
                 if (this.profile.ListPhoto != null) {
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {
-                        console.log(this.profile.ListPhoto[i])
                         try {
                             const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
                                 headers: { Authorization: `Bearer ${this.user.ID}` }
@@ -515,4 +524,5 @@ export default {
 
 .comment-area {
     margin-top: 10px;
-}</style>
+}
+</style>
