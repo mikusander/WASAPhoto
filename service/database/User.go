@@ -40,10 +40,10 @@ func (db *appdbimpl) CountFollowing(username string) (uint64, error) {
 	return numFollowing, err
 }
 
-func (db *appdbimpl) GetFollowPerson(userID string) ([]uint64, error) {
+func (db *appdbimpl) GetFollowPerson(userID string) ([]string, error) {
 	// Eseguire una query per verificare se l'username segue già quell'utente
 	query := `SELECT follow_user_id FROM Follow WHERE personal_user_id = ?`
-	var follow []uint64
+	var follow []string
 	rows, err := db.c.Query(query, userID)
 	if err != nil {
 		// Si è verificato un errore durante l'esecuzione della query
@@ -56,13 +56,12 @@ func (db *appdbimpl) GetFollowPerson(userID string) ([]uint64, error) {
 			return nil, err
 		}
 
-		var i uint64
-		i, err = db.CheckUserExists(x)
+		_, err = db.CheckUserExists(x)
 		if err != nil {
 			return nil, err
 		}
 
-		follow = append(follow, i)
+		follow = append(follow, x)
 	}
 
 	// Controlla se ci sono errori dopo l'iterazione dei risultati
@@ -105,7 +104,7 @@ func (db *appdbimpl) GetListPhoto(userID uint64) ([]Photo, error) {
 	var listPhoto []Photo
 	for rows.Next() {
 		var photo Photo
-		err := rows.Scan(&photo.ID, &photo.Date, &photo.Text, &photo.URL, &photo.UserID)
+		err := rows.Scan(&photo.ID, &photo.Date, &photo.Text, &photo.URL, &photo.UserID, &photo.UserUsername)
 		if err != nil {
 			return nil, err
 		}

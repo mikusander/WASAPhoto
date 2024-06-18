@@ -19,6 +19,7 @@ type Photo struct {
 	LikeCounter    uint64             `json:"LikeCounter"`
 	CommentCounter uint64             `json:"CommentCounter"`
 	UserID         uint64             `json:"UserID"`
+	UserUsername   string             `json:"UserUsername"`
 	ListComment    []database.Comment `json:"ListComment"`
 }
 

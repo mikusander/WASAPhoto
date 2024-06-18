@@ -43,6 +43,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var photo Photo
 
 	photo.UserID = userID
+	photo.UserUsername = user.Username
 
 	// decodifico il body e metto i campi dentro photo
 	err = json.NewDecoder(r.Body).Decode(&photo)
@@ -62,7 +63,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	photo.Date = dateString
 
-	photo.ID, err = rt.db.AddPhoto(photo.Date, photo.Text, photo.URL, photo.UserID)
+	photo.ID, err = rt.db.AddPhoto(photo.Date, photo.Text, photo.URL, photo.UserID, photo.UserUsername)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

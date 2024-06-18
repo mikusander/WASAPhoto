@@ -29,20 +29,20 @@
             <div class="photo-wrapper">
               <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
               <p style="color: black; font-weight: bold;">Date: {{ photo.Date }}</p>
+              <p style="color: black; font-weight: bold;">caricato da: {{ photo.UserUsername }}</p>
               <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
               <p style="color: black; font-weight: bold;">Like: {{ photo.likeCounter }}</p>
               <p style="color: black; font-weight: bold;">Comment: {{ photo.commentCounter }}</p>
-              <div style="width: 50px;" class="buttons-wrapper">
-                <button @click="toggleLike(photo)" class="btn mt-2" :class="{ 'liked': photo.liked }"
-                  style="background-color: transparent; border: none;">
-                  <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked" style="height: 30px; width: 30px;">
-                  <img v-else src="../images/heartWhite.png" alt="Not Liked" style="height: 30px; width: 30px;">
+              <div class="button-group">
+                <button @click="toggleLike(photo)" class="btn like-button" :class="{ 'liked': photo.liked }">
+                  <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked" class="button-image">
+                  <img v-else src="../images/heartWhite.png" alt="Not Liked" class="button-image">
                 </button>
-                <button @click="photo.showCommentArea = !photo.showCommentArea" class="btn mt-2"
-                  style="background-color: transparent; border: none;">
-                  <img src="../images/comment.png" style="width: 30px; height: 30px;">
+                <button @click="photo.showCommentArea = !photo.showCommentArea" class="btn comment-button">
+                  <img src="../images/comment.png" alt="Comment" class="button-image">
                 </button>
               </div>
+
               <div>
                 <button @click="toggleComments(photo)" class="btn mt-2"
                   style="background: none; border: none; padding: 0;">
@@ -119,7 +119,7 @@ export default {
           headers: { Authorization: `Bearer ${this.user.ID}` }
         });
         this.errormsg = null; // Resetta il messaggio di errore
-        this.getProfile();
+        this.stream();
       } catch (e) {
         if (e.response && e.response.status === 400) {
           this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -184,7 +184,7 @@ export default {
         photo.newComment = ""; // Pulisci l'area di testo del commento
         photo.showCommentArea = false; // Nascondi l'area di testo dopo aver inviato il commento
         this.errormsg = null; // Resetta il messaggio di errore
-        this.getProfile();
+        this.stream();
       } catch (e) {
         if (e.response && e.response.status === 400) {
           this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -295,9 +295,40 @@ export default {
   /* Aumenta il margine destro per più spazio */
 }
 
+.button-group {
+  display: flex;
+  gap: 20px; /* Spazio ridotto tra i bottoni */
+  justify-content: center; /* Centra i bottoni orizzontalmente */
+  align-items: center; /* Allinea i bottoni verticalmente al centro */
+}
+
+
+.like-button, .comment-button {
+  background-color: transparent;
+  border: none;
+  padding: 0; /* Rimuove il padding */
+  width: 30px; /* Imposta la larghezza del bottone */
+  height: 30px; /* Imposta l'altezza del bottone */
+  display: flex;
+  justify-content: center; /* Centra l'immagine orizzontalmente */
+  align-items: center; /* Centra l'immagine verticalmente */
+}
+
+.button-image {
+  width: 30px; /* Imposta la larghezza dell'immagine */
+  height: 30px; /* Imposta l'altezza dell'immagine */
+}
+
 .buttons-wrapper {
   display: flex;
   align-items: center;
+}
+
+.btn {
+    margin-right: 10px;
+    /* Aumenta il margine destro per più spazio */
+    border-radius: 50px;
+    /* Rendi i bordi completamente tondeggianti */
 }
 
 .comment-wrapper {

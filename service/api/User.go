@@ -207,15 +207,8 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	// assegno all'oggetto my stream l'user
 	myStream.UserOwner = user
 
-	// estraggo dal db tutte le persone che l'utente segue
-	listFollow, err := rt.db.GetFollowPerson(user.Username)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	// estraggo dal database la lista delle photo
-	myStream.ListPhoto, err = rt.db.GetAllPhoto(listFollow)
+	myStream.ListPhoto, err = rt.db.GetAllPhoto(user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

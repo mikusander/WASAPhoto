@@ -13,8 +13,8 @@
             <div class="num-info">
                 <span style="cursor: default;">{{ this.userProfile.Username }}</span>
                 <div style="margin-top: 20px;" class="d-flex align-items-center">
-                    <button v-if="!this.profile.isFollow" @click="followUser" class="bottone btn btn-success mr-4">Follow</button>
-                    <button v-else @click="unFollowUser" class="bottone btn btn-success mr-4">unFollow</button>
+                    <button v-if="(!this.profile.isFollow) && (!this.profile.isBan)" @click="followUser" class="bottone btn btn-success mr-4">Follow</button>
+                    <button v-else-if="!this.profile.isBan" @click="unFollowUser" class="bottone btn btn-success mr-4">unFollow</button>
                     <button v-if="!this.profile.isBan" @click="banUser" class="bottone btn btn-danger mr-4">Ban</button>
                     <button v-else @click="unBanUser" class="bottone btn btn-danger mr-4">unBan</button>
                 </div>
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="container">
-            <div class="photo-gallery" v-if="(profile.ListPhoto.length > 0) && (!this.profile.isBan)">
+            <div class="photo-gallery" v-if="(profile.ListPhoto.length > 0) && (!this.profile.isBan) && (!this.profile.isBanned)">
                 <div class="gallery">
                     <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
                         <div class="photo-wrapper">
@@ -113,6 +113,7 @@ export default {
                 ListPhoto: [],
                 isFollow: false,
                 isBan: false,
+                isBanned: false,
             }
         };
     },
@@ -226,11 +227,11 @@ export default {
                 let responseBanDue = await this.$axios.get("/users/" + this.userProfile.Username + "/ban/" + this.user.Username, {
                     headers: { Authorization: `Bearer ${this.userProfile.ID}` }
                 });
-                let banDue = responseBan.data;
+                let banDue = responseBanDue.data;
                 if (banDue.PersonalUserId != "") {
-                    this.profile.isBan = true;
+                    this.profile.isBanned = true;
                 } else {
-                    this.profile.isBan = false;
+                    this.profile.isBanned = false;
                 }
                 if (this.profile.ListPhoto != null) {
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {

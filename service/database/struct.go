@@ -16,6 +16,7 @@ type Photo struct {
 	CommentCounter uint64    `json:"commentCounter"`
 	ListComment    []Comment `json:"listComment"`
 	UserID         uint64    `json:"userID"`
+	UserUsername   string    `json:"UserUsername"`
 }
 
 // Comment rappresenta la struttura di un commento

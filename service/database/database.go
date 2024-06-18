@@ -48,14 +48,14 @@ type AppDatabase interface {
 	// User
 	SetNewUsername(userID uint64, newUsername string) error
 	GetListPhoto(userID uint64) ([]Photo, error)
-	GetFollowPerson(userID string) ([]uint64, error)
+	GetFollowPerson(userID string) ([]string, error)
 
 	// Photo
-	AddPhoto(Date string, Text string, URL []byte, userID uint64) (uint64, error)
+	AddPhoto(Date string, Text string, URL []byte, userID uint64, username string) (uint64, error)
 	CheckPhotoExists(photoid uint64) (bool, error)
 	DeletePhoto(id uint64) error
 	CountPhoto(userUD uint64) (uint64, error)
-	GetAllPhoto(listFollow []uint64) ([]Photo, error)
+	GetAllPhoto(username string) ([]Photo, error)
 
 	// follow
 	NewFollow(PersonaleUserID string, FollowUserID string) error
@@ -120,7 +120,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		Text TEXT NOT NULL, 
 		Image BLOB NOT NULL, 
 		user_id INTEGER NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES User(id)
+		user_username Text NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES User(Id)
+		FOREIGN KEY (user_username) REFERENCES User(Username)
 	);`
 
 	_, err = db.Exec(sqlStmt)
@@ -157,11 +159,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	sqlStmt = `CREATE TABLE IF NOT EXISTS Follow(
-		personal_user_id  INTEGER NOT NULL,
-		follow_user_id INTEGER NOT NULL,
+		personal_user_id  Text NOT NULL,
+		follow_user_id Text NOT NULL,
 		PRIMARY KEY(personal_user_id, follow_user_id),
-		FOREIGN KEY (personal_user_id) REFERENCES User(id),
-		FOREIGN KEY (follow_user_id) REFERENCES User(id)
+		FOREIGN KEY (personal_user_id) REFERENCES User(Username),
+		FOREIGN KEY (follow_user_id) REFERENCES User(Username)
 	);`
 
 	_, err = db.Exec(sqlStmt)
@@ -170,11 +172,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	sqlStmt = `CREATE TABLE IF NOT EXISTS Ban(
-		personal_user_id INTEGER NOT NULL,
-		ban_user_id INTEGER NOT NULL,
+		personal_user_id Text NOT NULL,
+		ban_user_id Text NOT NULL,
 		PRIMARY KEY(personal_user_id, ban_user_id)
-		FOREIGN KEY(personal_user_id) REFERENCES User(id)
-		FOREIGN KEY(ban_user_id) REFERENCES User(id)
+		FOREIGN KEY(personal_user_id) REFERENCES User(Username)
+		FOREIGN KEY(ban_user_id) REFERENCES User(Username)
 	);`
 
 	_, err = db.Exec(sqlStmt)
