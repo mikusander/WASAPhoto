@@ -60,7 +60,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// cambio dell'username
-	err = rt.db.SetNewUsername(userID, user.Username)
+	err = rt.db.SetNewUsername(userID, oldUsername, user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

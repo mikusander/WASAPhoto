@@ -20,6 +20,13 @@
         <div class="user-info">
             <div class="num-info">
                 <span style="cursor: default;">{{ user.Username }}</span>
+                <button @click="toggleChangeUsername()" class="btn btn-light rounded-pill" style="margin-left: 20px; font-size: 15px; font-weight: bold;">
+                    {{ this.changeUsername ? 'Nascondi' : 'Cambia username' }}
+                </button>
+                <form v-if="this.changeUsername" @submit.prevent="usernameChange">
+                    <input v-model="newUsername" type="text" placeholder="Inserisci username" />
+                    <button class="buttone" type="submit">Cambia</button>
+                </form>
             </div>
             <div class="num-info">
                 <span style="cursor: default;">{{ profile.NumPhoto }}</span>
@@ -101,6 +108,8 @@ export default {
             errormsg: null,
             loading: false,
             some_data: null,
+            changeUsername: false,
+            newUsername: "",
             user: {
                 ID: localStorage.getItem("token"),
                 Username: localStorage.getItem("username"),
@@ -114,8 +123,38 @@ export default {
         };
     },
     methods: {
+        async usernameChange() {
+            if (this.newUsername == "") {
+                this.errormsg = "il campo username è vuoto"
+            } else {
+                try {
+                let response = await this.$axios.put("/users/" + this.user.Username + "/username", 
+                    { username: this.newUsername },
+                    { headers: { Authorization: `Bearer ${this.user.ID}` } }
+                    )
+                this.user = response.data
+                localStorage.removeItem("username")
+                localStorage.setItem("username", this.user.Username)
+                this.getProfile();
+                this.changeUsername = false;
+                this.newUsername = "";
+                }
+                catch (e) {
+                if (e.response && e.response.status === 400) {
+                    this.errormsg = "Form error, please check all fields and try again";
+                } else if (e.response && e.response.status === 500) {
+                    this.errormsg = "Server error, please try again later";
+                } else {
+                    this.errormsg = e.toString();
+                }
+                }
+            }
+            },
         async toggleComments(photo) {
             photo.showComments = !photo.showComments;
+        },
+        async toggleChangeUsername(photo) {
+            this.changeUsername = !this.changeUsername;
         },
         async doLogout() {
             localStorage.removeItem("token");
@@ -286,6 +325,43 @@ export default {
 </script>
 
 <style scoped>
+
+.buttone {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: orangered;
+  color: black;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  /* Imposta la larghezza del bottone */
+  max-width: fit-content;
+  /* Larghezza massima del bottone */
+  border-radius: 10px;
+  /* Arrotonda i bordi del bottone */
+}
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  /* Aggiungi margine inferiore per spaziatura */
+  width: 100%;
+  /* Imposta la larghezza dell'input */
+  max-width: 300px;
+  /* Larghezza massima dell'input */
+  border-radius: 10px;
+  /* Arrotonda i bordi dell'input */
+}
+
+form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  /* Dispone gli elementi del form in colonna */
+  align-items: center;
+  /* Centra gli elementi del form */
+}
 
 .clickable-text {
     font-weight: bold;

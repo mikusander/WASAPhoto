@@ -46,7 +46,7 @@ type AppDatabase interface {
 	CreateUser(username string) (uint64, error)
 
 	// User
-	SetNewUsername(userID uint64, newUsername string) error
+	SetNewUsername(userID uint64, oldUsername string, newUsername string) error
 	GetListPhoto(userID uint64) ([]Photo, error)
 	GetFollowPerson(userID string) ([]string, error)
 

@@ -177,6 +177,8 @@ export default {
 
   
 <style scoped>
+
+
 .user-info {
     display: flex;
     align-items: center;

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 )
 
-func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
+func (db *appdbimpl) SetNewUsername(userID uint64, oldUsername string, newUsername string) error {
 	// Prepara la query di aggiornamento
 	query := "UPDATE User SET username = ? WHERE id = ?"
 
@@ -13,6 +13,47 @@ func (db *appdbimpl) SetNewUsername(userID uint64, newUsername string) error {
 	if err != nil {
 		return err
 	}
+
+	query = "UPDATE Photo SET user_username = ? WHERE user_id = ?"
+
+	// Esegui l'istruzione di aggiornamento
+	_, err = db.c.Exec(query, newUsername, userID)
+	if err != nil {
+		return err
+	}
+
+	query = "UPDATE Follow SET personal_user_id = ? WHERE personal_user_id = ?"
+
+	// Esegui l'istruzione di aggiornamento
+	_, err = db.c.Exec(query, newUsername, oldUsername)
+	if err != nil {
+		return err
+	}
+
+	query = "UPDATE Follow SET follow_user_id = ? WHERE follow_user_id = ?"
+
+	// Esegui l'istruzione di aggiornamento
+	_, err = db.c.Exec(query, newUsername, oldUsername)
+	if err != nil {
+		return err
+	}
+
+	query = "UPDATE Ban SET personal_user_id = ? WHERE personal_user_id = ?"
+
+	// Esegui l'istruzione di aggiornamento
+	_, err = db.c.Exec(query, newUsername, oldUsername)
+	if err != nil {
+		return err
+	}
+
+	query = "UPDATE Ban SET ban_user_id = ? WHERE ban_user_id = ?"
+
+	// Esegui l'istruzione di aggiornamento
+	_, err = db.c.Exec(query, newUsername, oldUsername)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
