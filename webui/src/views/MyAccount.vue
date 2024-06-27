@@ -20,7 +20,8 @@
         <div class="user-info">
             <div class="num-info">
                 <span style="cursor: default;">{{ user.Username }}</span>
-                <button @click="toggleChangeUsername()" class="btn btn-light rounded-pill" style="margin-left: 20px; font-size: 15px; font-weight: bold;">
+                <button @click="toggleChangeUsername()" class="btn btn-light rounded-pill"
+                    style="margin-left: 20px; font-size: 15px; font-weight: bold;">
                     {{ this.changeUsername ? 'Nascondi' : 'Cambia username' }}
                 </button>
                 <form v-if="this.changeUsername" @submit.prevent="usernameChange">
@@ -42,6 +43,8 @@
             </div>
         </div>
         <div class="container">
+            <!-- Messaggio di errore -->
+            <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
             <div class="photo-gallery" v-if="profile.ListPhoto.length > 0">
                 <div class="gallery">
                     <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
@@ -66,15 +69,18 @@
                                 <img src="../images/bucket.png" style="width: 20px; height: 20px;">
                             </button>
                             <div>
-                                <button @click="toggleComments(photo)" class="btn mt-2" style="background: none; border: none; padding: 0;">
+                                <button @click="toggleComments(photo)" class="btn mt-2"
+                                    style="background: none; border: none; padding: 0;">
                                     <p class="clickable-text">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
                                 </button>
                                 <div v-if="photo.showComments" class="comments">
-                                    <div v-for="comment in photo.listComment" :key="comment.ID" style="display: flex; align-items: center;">
+                                    <div v-for="comment in photo.listComment" :key="comment.ID"
+                                        style="display: flex; align-items: center;">
                                         <div class="comment-content">
                                             <p><strong>{{ comment.UserUsername }}:</strong> {{ comment.Text }}</p>
                                         </div>
-                                        <button v-if="comment.User_id == this.user.ID" class="btn delete-button" @click="deleteComment(photo.ID, comment.ID)">
+                                        <button v-if="comment.User_id == this.user.ID" class="btn delete-button"
+                                            @click="deleteComment(photo.ID, comment.ID)">
                                             <img src="../images/bucket.png" alt="Delete" class="delete-icon">
                                         </button>
                                     </div>
@@ -95,8 +101,6 @@
             <div v-else style="text-align: center; color: white;">
                 <p>Nessuna foto disponibile</p>
             </div>
-            <!-- Messaggio di errore -->
-            <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
         </div>
     </div>
 </template>
@@ -128,28 +132,28 @@ export default {
                 this.errormsg = "il campo username è vuoto"
             } else {
                 try {
-                let response = await this.$axios.put("/users/" + this.user.Username + "/username", 
-                    { username: this.newUsername },
-                    { headers: { Authorization: `Bearer ${this.user.ID}` } }
+                    let response = await this.$axios.put("/users/" + this.user.Username + "/username",
+                        { username: this.newUsername },
+                        { headers: { Authorization: `Bearer ${this.user.ID}` } }
                     )
-                this.user = response.data
-                localStorage.removeItem("username")
-                localStorage.setItem("username", this.user.Username)
-                this.getProfile();
-                this.changeUsername = false;
-                this.newUsername = "";
+                    this.user = response.data
+                    localStorage.removeItem("username")
+                    localStorage.setItem("username", this.user.Username)
+                    this.getProfile();
+                    this.changeUsername = false;
+                    this.newUsername = "";
                 }
                 catch (e) {
-                if (e.response && e.response.status === 400) {
-                    this.errormsg = "Form error, please check all fields and try again";
-                } else if (e.response && e.response.status === 500) {
-                    this.errormsg = "Server error, please try again later";
-                } else {
-                    this.errormsg = e.toString();
-                }
+                    if (e.response && e.response.status === 400) {
+                        this.errormsg = "Username già esistente";
+                    } else if (e.response && e.response.status === 500) {
+                        this.errormsg = "Server error, please try again later";
+                    } else {
+                        this.errormsg = e.toString();
+                    }
                 }
             }
-            },
+        },
         async toggleComments(photo) {
             photo.showComments = !photo.showComments;
         },
@@ -325,42 +329,41 @@ export default {
 </script>
 
 <style scoped>
-
 .buttone {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: orangered;
-  color: black;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  /* Imposta la larghezza del bottone */
-  max-width: fit-content;
-  /* Larghezza massima del bottone */
-  border-radius: 10px;
-  /* Arrotonda i bordi del bottone */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: orangered;
+    color: black;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    /* Imposta la larghezza del bottone */
+    max-width: fit-content;
+    /* Larghezza massima del bottone */
+    border-radius: 10px;
+    /* Arrotonda i bordi del bottone */
 }
 
 input[type="text"] {
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  /* Aggiungi margine inferiore per spaziatura */
-  width: 100%;
-  /* Imposta la larghezza dell'input */
-  max-width: 300px;
-  /* Larghezza massima dell'input */
-  border-radius: 10px;
-  /* Arrotonda i bordi dell'input */
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    /* Aggiungi margine inferiore per spaziatura */
+    width: 100%;
+    /* Imposta la larghezza dell'input */
+    max-width: 300px;
+    /* Larghezza massima dell'input */
+    border-radius: 10px;
+    /* Arrotonda i bordi dell'input */
 }
 
 form {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  /* Dispone gli elementi del form in colonna */
-  align-items: center;
-  /* Centra gli elementi del form */
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    /* Dispone gli elementi del form in colonna */
+    align-items: center;
+    /* Centra gli elementi del form */
 }
 
 .clickable-text {
@@ -370,24 +373,33 @@ form {
 }
 
 .clickable-text:hover {
-    color: rgba(0, 0, 0, 0.5); /* Schiarisce il testo al passaggio del mouse */
+    color: rgba(0, 0, 0, 0.5);
+    /* Schiarisce il testo al passaggio del mouse */
 }
 
 .comment-wrapper {
-    display: flex; /* Utilizza Flexbox */
-    align-items: center; /* Allinea verticalmente al centro */
+    display: flex;
+    /* Utilizza Flexbox */
+    align-items: center;
+    /* Allinea verticalmente al centro */
 }
 
 .comment-content {
-    flex: 1; /* Fai espandere il contenuto del commento per riempire lo spazio disponibile */
-    margin-right: 10px; /* Aggiungi uno spazio a destra tra il contenuto del commento e il pulsante */
+    flex: 1;
+    /* Fai espandere il contenuto del commento per riempire lo spazio disponibile */
+    margin-right: 10px;
+    /* Aggiungi uno spazio a destra tra il contenuto del commento e il pulsante */
 }
 
 .delete-button {
-    background-color: transparent; /* Imposta lo sfondo trasparente */
-    border: none; /* Rimuovi il bordo */
-    padding: 0; /* Rimuovi il padding */
-    cursor: pointer; /* Mostra il cursore come puntatore */
+    background-color: transparent;
+    /* Imposta lo sfondo trasparente */
+    border: none;
+    /* Rimuovi il bordo */
+    padding: 0;
+    /* Rimuovi il padding */
+    cursor: pointer;
+    /* Mostra il cursore come puntatore */
     height: 20px;
     width: 20px;
 }

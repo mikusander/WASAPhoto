@@ -9,85 +9,93 @@
                 </div>
             </div>
         </header>
-        <div class="user-info">
-            <div class="num-info">
-                <span style="cursor: default;">{{ this.userProfile.Username }}</span>
-                <div style="margin-top: 20px;" class="d-flex align-items-center">
-                    <button v-if="(!this.profile.isFollow) && (!this.profile.isBan)" @click="followUser" class="bottone btn btn-success mr-4">Follow</button>
-                    <button v-else-if="!this.profile.isBan" @click="unFollowUser" class="bottone btn btn-success mr-4">unFollow</button>
-                    <button v-if="!this.profile.isBan" @click="banUser" class="bottone btn btn-danger mr-4">Ban</button>
-                    <button v-else @click="unBanUser" class="bottone btn btn-danger mr-4">unBan</button>
+        <div v-if="loading" class="container">
+            <p>Loading...</p>
+        </div>
+        <div v-else>
+            <div class="user-info">
+                <div class="num-info">
+                    <span style="cursor: default;">{{ this.userProfile.Username }}</span>
+                    <div style="margin-top: 20px;" class="d-flex align-items-center">
+                        <button v-if="(!this.profile.isFollow) && (!this.isBan)" @click="followUser"
+                            class="bottone btn btn-success mr-4">Follow</button>
+                        <button v-else-if="!this.isBan" @click="unFollowUser"
+                            class="bottone btn btn-success mr-4">unFollow</button>
+                        <button v-if="!this.isBan" @click="banUser" class="bottone btn btn-danger mr-4">Ban</button>
+                        <button v-else @click="unBanUser" class="bottone btn btn-danger mr-4">unBan</button>
+                    </div>
+                </div>
+                <div class="num-info">
+                    <span style="cursor: default;">{{ this.profile.NumPhoto }}</span>
+                    <span style="cursor: default;">Numero di foto</span>
+                </div>
+                <div class="num-info">
+                    <span style="cursor: default;">{{ this.profile.NumFollow }}</span>
+                    <span style="cursor: default;">Seguiti</span>
+                </div>
+                <div class="num-info">
+                    <span style="cursor: default;">{{ this.profile.NumFollowing }}</span>
+                    <span style="cursor: default;">Seguaci</span>
                 </div>
             </div>
-            <div class="num-info">
-                <span style="cursor: default;">{{ this.profile.NumPhoto }}</span>
-                <span style="cursor: default;">Numero di foto</span>
-            </div>
-            <div class="num-info">
-                <span style="cursor: default;">{{ this.profile.NumFollow }}</span>
-                <span style="cursor: default;">Seguiti</span>
-            </div>
-            <div class="num-info">
-                <span style="cursor: default;">{{ this.profile.NumFollowing }}</span>
-                <span style="cursor: default;">Seguaci</span>
-            </div>
-        </div>
-        <div class="container">
-            <div class="photo-gallery" v-if="(profile.ListPhoto.length > 0) && (!this.profile.isBan) && (!this.profile.isBanned)">
-                <div class="gallery">
-                    <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
-                        <div class="photo-wrapper">
-                            <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
-                            <p style="color: black; font-weight: bold;">Date: {{ photo.Date }}</p>
-                            <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
-                            <p style="color: black; font-weight: bold;">Like: {{ photo.likeCounter }}</p>
-                            <p style="color: black; font-weight: bold;">Comment: {{ photo.commentCounter }}</p>
-                            <button @click="toggleLike(photo)" class="btn mt-2" :class="{ 'liked': photo.liked }"
-                                style="background-color: transparent; border: none;">
-                                <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked"
-                                    style="height: 30px; width: 30px;">
-                                <img v-else src="../images/heartWhite.png" alt="Not Liked"
-                                    style="height: 30px; width: 30px;">
-                            </button>
-                            <button @click="photo.showCommentArea = !photo.showCommentArea" class="btn mt-2"
-                                style="background-color: transparent; border: none;">
-                                <img src="../images/comment.png" style="width: 30px; height: 30px;">
-                            </button>
-                            <div>
-                                <button @click="toggleComments(photo)" class="btn mt-2" style="background: none; border: none; padding: 0;">
-                                    <p class="clickable-text">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
+            <div class="container">
+                <div class="photo-gallery" v-if="(profile.ListPhoto.length > 0) && (!this.isBan) && (!this.isBanned)">
+                    <div class="gallery">
+                        <div v-for="photo in profile.ListPhoto" :key="photo.ID" class="photo">
+                            <div class="photo-wrapper">
+                                <img :src="'data:image/jpeg;base64,' + photo.URL" :alt="photo.Text">
+                                <p style="color: black; font-weight: bold;">Date: {{ photo.Date }}</p>
+                                <p style="color: black; font-weight: bold;">Descrizione: {{ photo.Text }}</p>
+                                <p style="color: black; font-weight: bold;">Like: {{ photo.likeCounter }}</p>
+                                <p style="color: black; font-weight: bold;">Comment: {{ photo.commentCounter }}</p>
+                                <button @click="toggleLike(photo)" class="btn mt-2" :class="{ 'liked': photo.liked }"
+                                    style="background-color: transparent; border: none;">
+                                    <img v-if="photo.liked" src="../images/heartBlack.png" alt="Liked"
+                                        style="height: 30px; width: 30px;">
+                                    <img v-else src="../images/heartWhite.png" alt="Not Liked"
+                                        style="height: 30px; width: 30px;">
                                 </button>
-                                <div v-if="photo.showComments" class="comments">
-                                    <div v-for="comment in photo.listComment" :key="comment.ID"
-                                        style="display: flex; align-items: center;">
-                                        <div class="comment-content">
-                                            <p><strong>{{ comment.UserUsername }}:</strong> {{ comment.Text }}</p>
+                                <button @click="photo.showCommentArea = !photo.showCommentArea" class="btn mt-2"
+                                    style="background-color: transparent; border: none;">
+                                    <img src="../images/comment.png" style="width: 30px; height: 30px;">
+                                </button>
+                                <div>
+                                    <button @click="toggleComments(photo)" class="btn mt-2"
+                                        style="background: none; border: none; padding: 0;">
+                                        <p class="clickable-text">{{ photo.showComments ? 'Nascondi Commenti' : 'Mostra Commenti' }}</p>
+                                    </button>
+                                    <div v-if="photo.showComments" class="comments">
+                                        <div v-for="comment in photo.listComment" :key="comment.ID"
+                                            style="display: flex; align-items: center;">
+                                            <div class="comment-content">
+                                                <p><strong>{{ comment.UserUsername }}:</strong> {{ comment.Text }}</p>
+                                            </div>
+                                            <button v-if="comment.User_id == this.user.ID" class="btn delete-button"
+                                                @click="deleteComment(photo.ID, comment.ID)">
+                                                <img src="../images/bucket.png" alt="Delete" class="delete-icon">
+                                            </button>
                                         </div>
-                                        <button v-if="comment.User_id == this.user.ID" class="btn delete-button"
-                                            @click="deleteComment(photo.ID, comment.ID)">
-                                            <img src="../images/bucket.png" alt="Delete" class="delete-icon">
-                                        </button>
+
                                     </div>
-
                                 </div>
-                            </div>
 
-                            <div v-if="photo.showCommentArea" class="comment-area">
-                                <textarea v-model="photo.newComment" rows="3" class="form-control mt-2"
-                                    placeholder="Scrivi un commento..."></textarea>
-                                <button @click="addComment(photo)" class="btn mt-2"
-                                    style="background-color: green; color: white;">Invia</button>
+                                <div v-if="photo.showCommentArea" class="comment-area">
+                                    <textarea v-model="photo.newComment" rows="3" class="form-control mt-2"
+                                        placeholder="Scrivi un commento..."></textarea>
+                                    <button @click="addComment(photo)" class="btn mt-2"
+                                        style="background-color: green; color: white;">Invia</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div v-else style="text-align: center; color: white;">
+                    <p>Nessuna foto disponibile</p>
+                </div>
             </div>
-            <div v-else style="text-align: center; color: white;">
-                <p>Nessuna foto disponibile</p>
-            </div>
-            <!-- Messaggio di errore -->
-            <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
         </div>
+        <!-- Messaggio di errore -->
+        <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
     </div>
 </template>
 
@@ -96,7 +104,7 @@ export default {
     data() {
         return {
             errormsg: null,
-            loading: false,
+            loading: true,
             some_data: null,
             userProfile: {
                 ID: 0,
@@ -112,9 +120,9 @@ export default {
                 NumPhoto: 0,
                 ListPhoto: [],
                 isFollow: false,
-                isBan: false,
-                isBanned: false,
-            }
+            },
+            isBan: false,
+            isBanned: false,
         };
     },
     methods: {
@@ -125,7 +133,7 @@ export default {
                 });
                 this.errormsg = null;
                 this.getProfile(); // Aggiorna il profilo dopo aver seguito l'utente
-                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+                this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {
                 if (e.response && e.response.status === 400) {
                     this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -143,7 +151,7 @@ export default {
                 });
                 this.errormsg = null;
                 this.getProfile(); // Aggiorna il profilo dopo aver seguito l'utente
-                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+                this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {
                 if (e.response && e.response.status === 400) {
                     this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -161,7 +169,7 @@ export default {
                 });
                 this.errormsg = null;
                 this.getProfile(); // Aggiorna il profilo dopo aver bannato l'utente
-                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+                this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {
                 if (e.response && e.response.status === 400) {
                     this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -179,7 +187,7 @@ export default {
                 });
                 this.errormsg = null;
                 this.getProfile(); // Aggiorna il profilo dopo aver bannato l'utente
-                this.$router.push({ path: '/users/' + userProfile.Username + '/profile' });
+                this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {
                 if (e.response && e.response.status === 400) {
                     this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
@@ -200,40 +208,47 @@ export default {
             try {
                 let risposta = await this.$axios.get("/users/" + this.userProfile.Username + "/id");
                 let id = risposta.data;
-                let response = await this.$axios.get("/users/" + id.Username + "/profile",
-                    { headers: { Authorization: `Bearer ${id.ID}` } }
-                );
-                let utente = response.data;
-                this.userProfile.ID = id.ID;
-                this.profile = response.data;
-                let responseFollow = await this.$axios.get("/users/" + this.user.Username + "/follow/" + this.userProfile.Username, {
-                    headers: { Authorization: `Bearer ${this.user.ID}` }
-                });
-                let follow = responseFollow.data;
-                if (follow.PersonalUserId != "") {
-                    this.profile.isFollow = true;
-                } else {
-                    this.profile.isFollow = false;
-                }
+
                 let responseBan = await this.$axios.get("/users/" + this.user.Username + "/ban/" + this.userProfile.Username, {
                     headers: { Authorization: `Bearer ${this.user.ID}` }
                 });
                 let ban = responseBan.data;
                 if (ban.PersonalUserId != "") {
-                    this.profile.isBan = true;
+                    this.isBan = true;
                 } else {
-                    this.profile.isBan = false;
+                    this.isBan = false;
                 }
                 let responseBanDue = await this.$axios.get("/users/" + this.userProfile.Username + "/ban/" + this.user.Username, {
-                    headers: { Authorization: `Bearer ${this.userProfile.ID}` }
+                    headers: { Authorization: `Bearer ${id.ID}` }
                 });
                 let banDue = responseBanDue.data;
                 if (banDue.PersonalUserId != "") {
-                    this.profile.isBanned = true;
+                    this.isBanned = true;
                 } else {
-                    this.profile.isBanned = false;
+                    this.isBanned = false;
                 }
-                if (this.profile.ListPhoto != null) {
+                if (this.isBan == true || this.profile.banned == true) {
+                    this.profile.ListPhoto = [];
+                    this.profile.NumPhoto = 0;
+                    this.profile.NumFollow = 0;
+                    this.profile.NumFollowing = 0;
+                }
+                else if (this.profile.ListPhoto != []) {
+                    let response = await this.$axios.get("/users/" + id.Username + "/profile",
+                        { headers: { Authorization: `Bearer ${id.ID}` } }
+                    );
+                    let utente = response.data;
+                    this.userProfile.ID = id.ID;
+                    this.profile = response.data;
+                    let responseFollow = await this.$axios.get("/users/" + this.user.Username + "/follow/" + this.userProfile.Username, {
+                        headers: { Authorization: `Bearer ${this.user.ID}` }
+                    });
+                    let follow = responseFollow.data;
+                    if (follow.PersonalUserId != "") {
+                        this.profile.isFollow = true;
+                    } else {
+                        this.profile.isFollow = false;
+                    }
                     for (let i = 0; i < this.profile.ListPhoto.length; i++) {
                         try {
                             const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
@@ -276,6 +291,7 @@ export default {
                     this.errormsg = e.toString();
                 }
             }
+            this.loading = false;
         },
         async deleteComment(photoID, commentID) {
             try {
@@ -367,7 +383,6 @@ export default {
 </script>
 
 <style scoped>
-
 .clickable-text {
     font-weight: bold;
     cursor: pointer;
@@ -375,24 +390,26 @@ export default {
 }
 
 .clickable-text:hover {
-    color: rgba(0, 0, 0, 0.5); /* Schiarisce il testo al passaggio del mouse */
+    color: rgba(0, 0, 0, 0.5);
+    /* Schiarisce il testo al passaggio del mouse */
 }
 
 .bottone {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: orangered;
-  color: black;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  /* Imposta la larghezza del bottone */
-  max-width: 300px;
-  /* Larghezza massima del bottone */
-  border-radius: 10px;
-  /* Arrotonda i bordi del bottone */
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: orangered;
+    color: black;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    /* Imposta la larghezza del bottone */
+    max-width: 300px;
+    /* Larghezza massima del bottone */
+    border-radius: 10px;
+    /* Arrotonda i bordi del bottone */
 }
+
 .btn {
     margin-right: 10px;
     /* Aumenta il margine destro per più spazio */
@@ -525,5 +542,4 @@ export default {
 
 .comment-area {
     margin-top: 10px;
-}
-</style>
+}</style>
