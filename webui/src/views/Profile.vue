@@ -227,13 +227,13 @@ export default {
                 } else {
                     this.isBanned = false;
                 }
-                if (this.isBan == true || this.profile.banned == true) {
+                if (this.isBan == true || this.isBanned == true) {
                     this.profile.ListPhoto = [];
                     this.profile.NumPhoto = 0;
                     this.profile.NumFollow = 0;
                     this.profile.NumFollowing = 0;
                 }
-                else if (this.profile.ListPhoto != []) {
+                else{
                     let response = await this.$axios.get("/users/" + id.Username + "/profile",
                         { headers: { Authorization: `Bearer ${id.ID}` } }
                     );
@@ -249,37 +249,39 @@ export default {
                     } else {
                         this.profile.isFollow = false;
                     }
-                    for (let i = 0; i < this.profile.ListPhoto.length; i++) {
-                        try {
-                            const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
-                                headers: { Authorization: `Bearer ${this.user.ID}` }
-                            });
-                            let like = isLike.data;
-                            if (like.User_id == 0) {
-                                this.profile.ListPhoto[i].liked = false;
-                            }
-                            else {
-                                this.profile.ListPhoto[i].liked = true;
-                            }
-                            this.errormsg = null;
-                            // Aggiungi una proprietà per gestire la visualizzazione dei commenti
-                            this.profile.ListPhoto[i].showComments = false;
-                            // Aggiungi una proprietà per memorizzare i commenti relativi ad ogni foto
-                        } catch (e) {
-                            if (e.response && e.response.status === 400) {
-                                this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
-                            } else if (e.response && e.response.status === 500) {
-                                this.errormsg = "Errore del server, riprova più tardi";
-                            } else {
-                                this.errormsg = e.toString();
+                    if (this.profile.ListPhoto != null){
+                        for (let i = 0; i < this.profile.ListPhoto.length; i++) {
+                            try {
+                                const isLike = await this.$axios.get(`/users/${this.user.Username}/photo/${this.profile.ListPhoto[i].ID}/like/${this.user.Username}`, {
+                                    headers: { Authorization: `Bearer ${this.user.ID}` }
+                                });
+                                let like = isLike.data;
+                                if (like.User_id == 0) {
+                                    this.profile.ListPhoto[i].liked = false;
+                                }
+                                else {
+                                    this.profile.ListPhoto[i].liked = true;
+                                }
+                                this.errormsg = null;
+                                // Aggiungi una proprietà per gestire la visualizzazione dei commenti
+                                this.profile.ListPhoto[i].showComments = false;
+                                // Aggiungi una proprietà per memorizzare i commenti relativi ad ogni foto
+                            } catch (e) {
+                                if (e.response && e.response.status === 400) {
+                                    this.errormsg = "Errore nel modulo, controlla tutti i campi e riprova";
+                                } else if (e.response && e.response.status === 500) {
+                                    this.errormsg = "Errore del server, riprova più tardi";
+                                } else {
+                                    this.errormsg = e.toString();
+                                }
                             }
                         }
                     }
+                    else {
+                        this.profile.ListPhoto = [];
+                    }
                 }
-                else {
-                    this.profile.ListPhoto = [];
-                }
-
+                
                 this.errormsg = null; // Resetta il messaggio di errore
                 this.$router.push({ path: '/users/' + this.userProfile.Username + '/profile' });
             } catch (e) {

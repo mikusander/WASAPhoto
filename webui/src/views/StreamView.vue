@@ -244,29 +244,37 @@ export default {
     },
     async searchUser() {
       if (this.searchUsername == "") {
-        this.errormsg = "il campo username è vuoto"
+        this.errormsg = "il campo username è vuoto";
       } else if (this.searchUsername == this.user.Username) {
         this.$router.push({ path: '/users/' + this.user.Username + '/MyAccount' })
       } else {
         try {
           let risposta = await this.$axios.get("/users/" + this.searchUsername + "/id");
           let id = risposta.data;
-          try {
-            let response = await this.$axios.get("/users/" + id.Username + "/profile",
-              { headers: { Authorization: `Bearer ${id.ID}` } }
-            );
-            let utente = response.data;
-            this.$router.push({ path: '/users/' + utente.UserOwner.Username + '/profile' });
-          }
-          catch (e) {
-            if (e.response && e.response.status === 400) {
-              this.errormsg = "Form error, please check all fields and try again";
-            } else if (e.response && e.response.status === 404) {
-              this.errormsg = "Utente non trovato";
-            } else if (e.response && e.response.status === 500) {
-              this.errormsg = "Server error, please try again later";
-            } else {
-              this.errormsg = e.toString();
+          let responseBanDue = await this.$axios.get("/users/" + this.searchUsername + "/ban/" + this.user.Username, {
+              headers: { Authorization: `Bearer ${id.ID}` }
+          });
+          let banDue = responseBanDue.data;
+          if (banDue.PersonalUserId != "") {
+              this.errormsg = "utente non trovato";
+          } else {
+            try {
+              let response = await this.$axios.get("/users/" + id.Username + "/profile",
+                { headers: { Authorization: `Bearer ${id.ID}` } }
+              );
+              let utente = response.data;
+              this.$router.push({ path: '/users/' + utente.UserOwner.Username + '/profile' });
+            }
+            catch (e) {
+              if (e.response && e.response.status === 400) {
+                this.errormsg = "Form error, please check all fields and try again";
+              } else if (e.response && e.response.status === 404) {
+                this.errormsg = "Utente non trovato";
+              } else if (e.response && e.response.status === 500) {
+                this.errormsg = "Server error, please try again later";
+              } else {
+                this.errormsg = e.toString();
+              }
             }
           }
         }
